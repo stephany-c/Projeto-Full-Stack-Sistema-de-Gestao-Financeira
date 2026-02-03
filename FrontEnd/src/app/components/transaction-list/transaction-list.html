@@ -1,0 +1,61 @@
+<div class="transaction-list-container">
+    <h2>Transações</h2>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>De:</label>
+            <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); applyFilter()">
+        </div>
+        <div class="filter-group">
+            <label>Até:</label>
+            <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); applyFilter()">
+        </div>
+        <div class="filter-group">
+            <label>Categoria:</label>
+            <select [ngModel]="selectedCategoryId()"
+                (ngModelChange)="selectedCategoryId.set($event); applyLocalFilters()">
+                <option value="">Todas</option>
+                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.icon }} {{ cat.name }}</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Tipo:</label>
+            <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); applyLocalFilters()">
+                <option value="">Todos</option>
+                <option value="INCOME">Receitas</option>
+                <option value="EXPENSE">Despesas</option>
+            </select>
+        </div>
+        <button class="btn-clear" (click)="clearFilter()">Limpar</button>
+    </div>
+
+    <table class="transaction-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let t of transactions()" [ngClass]="t.type.toLowerCase()">
+                <td>{{ t.date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ t.description }}</td>
+                <td>
+                    <span class="category-badge">
+                        {{ t.categoryIcon }} {{ t.categoryName }}
+                    </span>
+                </td>
+                <td>{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
+                <td>{{ t.amount | currency:'BRL' }}</td>
+                <td>
+                    <button class="btn-delete" (click)="deleteTransaction(t.id)">🗑️</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
+</div>

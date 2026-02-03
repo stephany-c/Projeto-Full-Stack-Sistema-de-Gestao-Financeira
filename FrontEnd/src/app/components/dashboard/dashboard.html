@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+  <h2>Dashboard Financeiro 📊</h2>
+
+  <div class="summary-grid">
+    <div class="summary-card balance">
+      <h3>Saldo Total</h3>
+      <p>{{ balance() | currency:'BRL' }}</p>
+    </div>
+    <div class="summary-card monthly">
+      <h3>Resultado do Mês</h3>
+      <p [ngClass]="monthlyResult() >= 0 ? 'positive' : 'negative'">
+        {{ monthlyResult() | currency:'BRL' }}
+      </p>
+    </div>
+    <div class="summary-card income">
+      <h3>Total Receitas</h3>
+      <p>{{ totalIncome() | currency:'BRL' }}</p>
+    </div>
+    <div class="summary-card expense">
+      <h3>Total Despesas</h3>
+      <p>{{ totalExpense() | currency:'BRL' }}</p>
+    </div>
+  </div>
+
+  <div class="charts-container">
+    <div class="chart-box">
+      <h3>Receitas vs Despesas</h3>
+      <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="'pie'"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>Despesas por Categoria</h3>
+      <canvas baseChart [data]="categoryChartData" [options]="pieChartOptions" [type]="'doughnut'"></canvas>
+    </div>
+  </div>
+</div>

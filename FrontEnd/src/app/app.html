@@ -1,0 +1,36 @@
+<div class="app-layout" [class.sidebar-closed]="!isSidebarOpen()">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo">💰</span>
+      <h1 *ngIf="isSidebarOpen()">FinançaX</h1>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="icon">📊</span>
+        <span class="label" *ngIf="isSidebarOpen()">Dashboard</span>
+      </a>
+      <a routerLink="/transactions" routerLinkActive="active" class="nav-item">
+        <span class="icon">📜</span>
+        <span class="label" *ngIf="isSidebarOpen()">Transações</span>
+      </a>
+      <a routerLink="/add-transaction" routerLinkActive="active" class="nav-item">
+        <span class="icon">➕</span>
+        <span class="label" *ngIf="isSidebarOpen()">Nova Transação</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header>
+      <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
+      <div class="user-info">
+        <span>Bem-vindo, <strong>User Demo</strong></span>
+      </div>
+    </header>
+
+    <div class="page-container">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
