@@ -1,0 +1,51 @@
+<div class="category-manager-container">
+    <h2>Gerenciar Categorias</h2>
+
+    <div class="add-category-form">
+        <input type="text" [(ngModel)]="newCategoryName" placeholder="Nome da categoria" class="form-input">
+        <button (click)="addCategory()" class="btn-primary">Adicionar</button>
+    </div>
+
+    <div class="category-list">
+        <div *ngFor="let category of categories()" class="category-item" [class.editing]="editingId() === category.id"
+            [class.deleting]="deletingId() === category.id">
+
+            <div *ngIf="editingId() === category.id; else otherModes" class="edit-mode">
+                <input [(ngModel)]="editName" class="form-input">
+                <button (click)="saveEdit(category.id)" class="btn-sm btn-success">Salvar</button>
+                <button (click)="cancelEdit()" class="btn-sm btn-secondary">Cancelar</button>
+            </div>
+
+            <ng-template #otherModes>
+                <div *ngIf="deletingId() === category.id; else displayMode" class="delete-reassign-mode">
+                    <div class="reassign-prompt">
+                        Mover transações para:
+                        <select [(ngModel)]="transferToId" class="form-input sm">
+                            <option [value]="null">Nenhuma (apagar)</option>
+                            <option *ngFor="let other of getOtherCategories(category.id)" [value]="other.id">
+                                {{ other.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="reassign-actions">
+                        <button (click)="confirmDelete(category.id)" class="btn-sm btn-danger">Confirmar
+                            Exclusão</button>
+                        <button (click)="cancelDelete()" class="btn-sm btn-secondary">Cancelar</button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #displayMode>
+                <span class="category-name">{{ category.name }}</span>
+                <div class="actions">
+                    <button (click)="startEdit(category)" class="btn-icon" title="Editar">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button (click)="startDelete(category.id)" class="btn-icon delete" title="Excluir">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

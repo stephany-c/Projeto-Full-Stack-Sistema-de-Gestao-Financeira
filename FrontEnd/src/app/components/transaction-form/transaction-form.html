@@ -28,11 +28,34 @@
             </div>
             <div class="form-group">
                 <label>Categoria</label>
-                <select formControlName="categoryId">
-                    <option *ngFor="let cat of categories()" [value]="cat.id">
-                        {{ cat.icon }} {{ cat.name }}
-                    </option>
-                </select>
+                <div class="category-select-wrapper">
+                    <select formControlName="categoryId" [class.error-field]="!hasCategories()">
+                        <option value="" disabled selected>
+                            {{ loading() ? 'Carregando categorias...' : (categories().length === 0 ? 'Nenhuma categoria
+                            encontrada' : 'Selecione uma categoria') }}
+                        </option>
+                        <option *ngFor="let cat of categories()" [value]="cat.id">
+                            {{ cat.name }}
+                        </option>
+                    </select>
+                    <button type="button" class="btn-quick-add" (click)="toggleQuickAdd()" title="Nova Categoria">
+                        <i class="fa-solid" [class.fa-plus]="!isAddingCategory()"
+                            [class.fa-xmark]="isAddingCategory()"></i>
+                    </button>
+                </div>
+
+                <div class="quick-add-container" *ngIf="isAddingCategory()">
+                    <input type="text" [(ngModel)]="newCategoryName" [ngModelOptions]="{standalone: true}"
+                        placeholder="Nome da categoria..." (keyup.enter)="quickAddCategory()">
+                    <button type="button" (click)="quickAddCategory()" [disabled]="!newCategoryName.trim()"
+                        class="btn-save-quick">Salvar</button>
+                </div>
+
+                <div class="no-categories-warning" *ngIf="!loading() && !hasCategories() && !isAddingCategory()">
+                    <span class="warning-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
+                    Você ainda não tem categorias.
+                    <a (click)="toggleQuickAdd()" class="create-link">Criar Agora</a>
+                </div>
             </div>
         </div>
 

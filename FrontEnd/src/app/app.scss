@@ -13,6 +13,16 @@
             }
         }
     }
+
+    &.no-auth {
+        background: #f0f2f5;
+        .content {
+            padding: 0;
+            .page-container {
+                padding: 0;
+            }
+        }
+    }
 }
 
 .sidebar {
@@ -75,6 +85,16 @@
                 font-size: 1rem;
                 font-weight: 500;
             }
+        }
+        
+        .nav-spacer {
+            height: 2rem;
+        }
+        
+        .logout-item {
+            cursor: pointer;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
     }
 }

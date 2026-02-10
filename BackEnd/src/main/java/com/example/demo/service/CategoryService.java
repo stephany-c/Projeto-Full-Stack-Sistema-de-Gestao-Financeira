@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.CategoryRequestDTO;
 import com.example.demo.dto.CategoryResponseDTO;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.User;
@@ -18,23 +19,23 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final com.example.demo.repository.TransactionRepository transactionRepository;
 
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> findAllByUser(Long userId) {
-        return categoryRepository.findByUserId(userId)
+        return categoryRepository.findByUser_Id(userId)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public CategoryResponseDTO create(String name, String icon, Long userId) {
+    public CategoryResponseDTO create(CategoryRequestDTO dto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Category category = Category.builder()
-                .name(name)
-                .icon(icon)
+                .name(dto.getName())
                 .user(user)
                 .build();
 
@@ -42,11 +43,54 @@ public class CategoryService {
         return toDTO(saved);
     }
 
+    @Transactional
+    public CategoryResponseDTO update(Long categoryId, CategoryRequestDTO dto, Long userId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (!category.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        category.setName(dto.getName());
+
+        Category updated = categoryRepository.save(category);
+        return toDTO(updated);
+    }
+
+    @Transactional
+    public void delete(Long categoryId, Long transferToCategoryId, Long userId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (!category.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (transferToCategoryId != null) {
+            transactionRepository.updateCategory(categoryId, transferToCategoryId);
+        }
+
+        categoryRepository.delete(category);
+    }
+
+    @Transactional
+    public void initializeDefaultCategories(User user) {
+        List<Category> defaultCategories = List.of(
+                Category.builder().name("Alimentação").user(user).build(),
+                Category.builder().name("Transporte").user(user).build(),
+                Category.builder().name("Lazer").user(user).build(),
+                Category.builder().name("Saúde").user(user).build(),
+                Category.builder().name("Educação").user(user).build(),
+                Category.builder().name("Moradia").user(user).build(),
+                Category.builder().name("Outros").user(user).build());
+        categoryRepository.saveAll(defaultCategories);
+    }
+
     private CategoryResponseDTO toDTO(Category category) {
         CategoryResponseDTO dto = new CategoryResponseDTO();
         dto.setId(category.getId());
         dto.setName(category.getName());
-        dto.setIcon(category.getIcon());
         return dto;
     }
 }

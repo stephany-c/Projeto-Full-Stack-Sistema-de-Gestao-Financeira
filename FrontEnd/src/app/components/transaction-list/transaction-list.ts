@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { Transaction, TransactionType } from '../../models/transaction.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-transaction-list',
@@ -13,6 +14,7 @@ import { Transaction, TransactionType } from '../../models/transaction.model';
     styleUrl: './transaction-list.scss'
 })
 export class TransactionListComponent implements OnInit {
+    private authService = inject(AuthService);
     transactions = signal<Transaction[]>([]);
     allTransactions: Transaction[] = []; // Cache para filtro local rápido
     categories = signal<Category[]>([]);
@@ -40,7 +42,7 @@ export class TransactionListComponent implements OnInit {
     }
 
     loadCategories(): void {
-        this.categoryService.getByUser(1).subscribe(data => this.categories.set(data));
+        this.categoryService.getAll().subscribe(data => this.categories.set(data));
     }
 
     applyFilter(): void {

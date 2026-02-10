@@ -1,31 +1,42 @@
-<div class="app-layout" [class.sidebar-closed]="!isSidebarOpen()">
-  <aside class="sidebar">
+<div class="app-layout" [class.sidebar-closed]="!isSidebarOpen()" [class.no-auth]="!authService.isAuthenticated()">
+  <aside class="sidebar" *ngIf="authService.isAuthenticated()">
     <div class="brand">
-      <span class="logo">💰</span>
+      <span class="logo"><i class="fa-solid fa-wallet"></i></span>
       <h1 *ngIf="isSidebarOpen()">FinançaX</h1>
     </div>
 
     <nav>
       <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
-        <span class="icon">📊</span>
+        <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
         <span class="label" *ngIf="isSidebarOpen()">Dashboard</span>
       </a>
       <a routerLink="/transactions" routerLinkActive="active" class="nav-item">
-        <span class="icon">📜</span>
+        <span class="icon"><i class="fa-solid fa-list-ul"></i></span>
         <span class="label" *ngIf="isSidebarOpen()">Transações</span>
       </a>
       <a routerLink="/add-transaction" routerLinkActive="active" class="nav-item">
-        <span class="icon">➕</span>
+        <span class="icon"><i class="fa-solid fa-circle-plus"></i></span>
         <span class="label" *ngIf="isSidebarOpen()">Nova Transação</span>
+      </a>
+      <a routerLink="/categories" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="fa-solid fa-tags"></i></span>
+        <span class="label" *ngIf="isSidebarOpen()">Categorias</span>
+      </a>
+
+      <div class="nav-spacer"></div>
+
+      <a (click)="logout()" class="nav-item logout-item">
+        <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+        <span class="label" *ngIf="isSidebarOpen()">Sair</span>
       </a>
     </nav>
   </aside>
 
   <main class="content">
-    <header>
-      <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
+    <header *ngIf="authService.isAuthenticated()">
+      <button class="toggle-btn" (click)="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
       <div class="user-info">
-        <span>Bem-vindo, <strong>User Demo</strong></span>
+        <span>Bem-vindo, <strong>{{ authService.currentUser()?.name }}</strong></span>
       </div>
     </header>
 

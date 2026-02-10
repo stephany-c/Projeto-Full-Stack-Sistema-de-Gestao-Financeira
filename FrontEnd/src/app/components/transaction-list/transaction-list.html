@@ -1,5 +1,8 @@
 <div class="transaction-list-container">
-    <h2>Transações</h2>
+    <div class="header-actions">
+        <h2>Transações</h2>
+        <a routerLink="/categories" class="btn-link">Gerenciar Categorias</a>
+    </div>
 
     <div class="filters">
         <div class="filter-group">
@@ -15,7 +18,7 @@
             <select [ngModel]="selectedCategoryId()"
                 (ngModelChange)="selectedCategoryId.set($event); applyLocalFilters()">
                 <option value="">Todas</option>
-                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.icon }} {{ cat.name }}</option>
+                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
             </select>
         </div>
         <div class="filter-group">
@@ -46,13 +49,14 @@
                 <td>{{ t.description }}</td>
                 <td>
                     <span class="category-badge">
-                        {{ t.categoryIcon }} {{ t.categoryName }}
+                        {{ t.categoryName }}
                     </span>
                 </td>
                 <td>{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
                 <td>{{ t.amount | currency:'BRL' }}</td>
                 <td>
-                    <button class="btn-delete" (click)="deleteTransaction(t.id)">🗑️</button>
+                    <button class="btn-delete" (click)="deleteTransaction(t.id)"><i
+                            class="fa-solid fa-trash-can"></i></button>
                 </td>
             </tr>
         </tbody>
