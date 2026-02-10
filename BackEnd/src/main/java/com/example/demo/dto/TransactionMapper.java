@@ -17,7 +17,6 @@ public class TransactionMapper {
         dto.setType(transaction.getType());
         if (transaction.getCategory() != null) {
             dto.setCategoryName(transaction.getCategory().getName());
-            dto.setCategoryIcon(transaction.getCategory().getIcon());
         }
         return dto;
     }

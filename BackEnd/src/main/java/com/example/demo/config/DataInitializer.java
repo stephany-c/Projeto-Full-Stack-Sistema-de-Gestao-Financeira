@@ -23,14 +23,20 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         System.out.println(">>> Verificando dados iniciais...");
 
-        if (userRepository.count() == 0) {
+        User admin = userRepository.findByEmail("admin@admin.com").orElseGet(() -> {
             User defaultUser = User.builder()
                     .name("Usuário Padrão")
                     .email("admin@admin.com")
                     .password(passwordEncoder.encode("123456"))
                     .build();
-            userRepository.save(defaultUser);
+            User saved = userRepository.save(defaultUser);
             System.out.println("✅ Usuário padrão criado.");
+            return saved;
+        });
+
+        if (categoryRepository.findByUser(admin).isEmpty()) {
+            categoryService.initializeDefaultCategories(admin);
+            System.out.println("✅ Categorias iniciais criadas para o admin.");
         }
 
     }

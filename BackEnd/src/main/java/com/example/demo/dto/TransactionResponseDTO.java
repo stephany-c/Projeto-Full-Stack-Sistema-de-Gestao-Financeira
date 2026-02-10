@@ -14,5 +14,4 @@ public class TransactionResponseDTO {
     private LocalDate date;
     private TransactionType type;
     private String categoryName;
-    private String categoryIcon;
 }

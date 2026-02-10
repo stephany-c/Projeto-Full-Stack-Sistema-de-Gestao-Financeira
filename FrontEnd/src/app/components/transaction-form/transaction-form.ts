@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, signal, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
@@ -41,10 +41,12 @@ export class TransactionFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const userId = this.authService.getUserId() || 1; // Fallback to user 1
-        console.log('🔍 TransactionForm - ngOnInit - userId:', userId);
-        this.transactionForm.patchValue({ userId });
-        this.loadCategories(userId);
+        const userId = this.authService.getUserId();
+        if (userId) {
+            console.log('🔍 TransactionForm - ngOnInit - userId:', userId);
+            this.transactionForm.patchValue({ userId });
+            this.loadCategories(userId);
+        }
     }
 
     loadCategories(userId: number): void {
@@ -80,9 +82,11 @@ export class TransactionFormComponent implements OnInit {
         this.loading.set(true);
         this.categoryService.create(this.newCategoryName).subscribe({
             next: (newCat) => {
-                const userId = this.authService.getUserId() || 1;
-                this.loadCategories(userId); // Refresh list
-                this.transactionForm.patchValue({ categoryId: newCat.id });
+                const userId = this.authService.getUserId();
+                if (userId) {
+                    this.loadCategories(userId); // Refresh list
+                    this.transactionForm.patchValue({ categoryId: newCat.id });
+                }
                 this.toggleQuickAdd();
             },
             error: (err) => {
@@ -94,7 +98,11 @@ export class TransactionFormComponent implements OnInit {
 
     onSubmit(): void {
         if (this.transactionForm.valid) {
-            const userId = this.authService.getUserId() || 1; // Fallback to user 1
+            const userId = this.authService.getUserId();
+            if (!userId) {
+                console.error('User not authenticated');
+                return;
+            }
             const formValue = { ...this.transactionForm.value, userId };
 
             this.transactionService.create(formValue).subscribe({

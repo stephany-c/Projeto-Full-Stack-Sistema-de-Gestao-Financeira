@@ -10,5 +10,4 @@ export interface Transaction {
     date: string;
     type: TransactionType;
     categoryName: string;
-    categoryIcon: string;
 }

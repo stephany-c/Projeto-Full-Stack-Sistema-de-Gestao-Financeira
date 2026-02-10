@@ -13,12 +13,14 @@ export class TransactionService {
     constructor(private http: HttpClient, private authService: AuthService) { }
 
     getAll(): Observable<Transaction[]> {
-        const userId = this.authService.getUserId() || 1; // Fallback to user 1
+        const userId = this.authService.getUserId();
+        if (!userId) throw new Error('User not authenticated');
         return this.http.get<Transaction[]>(`${this.apiUrl}/user/${userId}`);
     }
 
     getByPeriod(startDate: string, endDate: string): Observable<Transaction[]> {
-        const userId = this.authService.getUserId() || 1; // Fallback to user 1
+        const userId = this.authService.getUserId();
+        if (!userId) throw new Error('User not authenticated');
         const params = new HttpParams()
             .set('startDate', startDate)
             .set('endDate', endDate);
@@ -26,7 +28,8 @@ export class TransactionService {
     }
 
     create(transaction: Transaction): Observable<Transaction> {
-        const userId = this.authService.getUserId() || 1; // Fallback to user 1
+        const userId = this.authService.getUserId();
+        if (!userId) throw new Error('User not authenticated');
         const payload = { ...transaction, userId };
         return this.http.post<Transaction>(this.apiUrl, payload);
     }

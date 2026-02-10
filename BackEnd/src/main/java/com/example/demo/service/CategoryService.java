@@ -5,6 +5,7 @@ import com.example.demo.dto.CategoryResponseDTO;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.User;
 import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.TransactionRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-    private final com.example.demo.repository.TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> findAllByUser(Long userId) {

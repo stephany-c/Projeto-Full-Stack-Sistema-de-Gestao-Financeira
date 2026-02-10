@@ -1,0 +1,38 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Criar Conta</h1>
+        <p>Comece a controlar suas finanças hoje mesmo</p>
+
+        <form (ngSubmit)="onRegister()" #registerForm="ngForm">
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome">
+            </div>
+
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" [(ngModel)]="user.email" name="email" required email placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" [(ngModel)]="user.password" name="password" required minlength="6"
+                    placeholder="Sua senha">
+            </div>
+
+            <div *ngIf="errorMessage" class="error-message">
+                {{ errorMessage }}
+            </div>
+
+            <div *ngIf="successMessage" class="success-message">
+                {{ successMessage }}
+            </div>
+
+            <button type="submit" class="btn-primary" [disabled]="!registerForm.form.valid">Cadastrar</button>
+        </form>
+
+        <div class="auth-footer">
+            Já tem uma conta? <a routerLink="/login">Entrar</a>
+        </div>
+    </div>
+</div>
