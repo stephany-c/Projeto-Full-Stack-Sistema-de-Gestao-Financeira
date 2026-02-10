@@ -116,4 +116,4 @@ npm start
 Este projeto está sob a licença [MIT](LICENSE).
 
 ---
-*Desenvolvido com ❤️ por Stephany C.*
+*Desenvolvido por Stephany C.*
