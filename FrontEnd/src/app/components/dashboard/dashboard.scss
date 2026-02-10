@@ -95,4 +95,38 @@
             max-height: 300px !important;
         }
     }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+
+        .chart-box {
+            padding: 1rem;
+            min-height: 300px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .summary-grid {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        padding: 1.25rem;
+
+        p {
+            font-size: 1.5rem;
+        }
+    }
 }

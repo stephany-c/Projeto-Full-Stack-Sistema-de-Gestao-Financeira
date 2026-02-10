@@ -1,38 +1,62 @@
 <div class="auth-container">
+    <div class="auth-background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <div class="auth-card">
+        <div class="brand-header">
+            <span class="logo-icon"><i class="fa-solid fa-wallet"></i></span>
+            <h2>FinançaX</h2>
+        </div>
+
         <h1>Criar Conta</h1>
-        <p>Comece a controlar suas finanças hoje mesmo</p>
+        <p>Comece a controlar sua vida financeira hoje.</p>
 
         <form (ngSubmit)="onRegister()" #registerForm="ngForm">
             <div class="form-group">
                 <label>Nome Completo</label>
-                <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user field-icon"></i>
+                    <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome completo">
+                </div>
             </div>
 
             <div class="form-group">
                 <label>E-mail</label>
-                <input type="email" [(ngModel)]="user.email" name="email" required email placeholder="seu@email.com">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope field-icon"></i>
+                    <input type="email" [(ngModel)]="user.email" name="email" required email
+                        placeholder="seu@email.com">
+                </div>
             </div>
 
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" [(ngModel)]="user.password" name="password" required minlength="6"
-                    placeholder="Sua senha">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" [(ngModel)]="user.password" name="password" required minlength="6"
+                        placeholder="Crie uma senha forte">
+                </div>
             </div>
 
             <div *ngIf="errorMessage" class="error-message">
-                {{ errorMessage }}
+                <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
             </div>
 
             <div *ngIf="successMessage" class="success-message">
-                {{ successMessage }}
+                <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
             </div>
 
-            <button type="submit" class="btn-primary" [disabled]="!registerForm.form.valid">Cadastrar</button>
+            <button type="submit" class="btn-primary" [disabled]="!registerForm.form.valid">
+                <span>Cadastrar</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
         </form>
 
         <div class="auth-footer">
-            Já tem uma conta? <a routerLink="/login">Entrar</a>
+            Já possui conta? <a routerLink="/login">Ir para o login</a>
         </div>
     </div>
 </div>

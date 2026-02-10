@@ -1,7 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, signal, inject, HostListener, effect } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,34 @@ import { AuthService } from './services/auth.service';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('Sistema Financeiro');
+  protected readonly title = signal('FinançaX');
   authService = inject(AuthService);
   router = inject(Router);
 
-  isSidebarOpen = signal(true);
+  isSidebarOpen = signal(window.innerWidth > 768);
+  isMobile = signal(window.innerWidth <= 768);
+
+  constructor() {
+    // Escuta mudanças de rota para fechar sidebar no mobile
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      if (this.isMobile()) {
+        this.isSidebarOpen.set(false);
+      }
+    });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    const wasMobile = this.isMobile();
+    this.isMobile.set(event.target.innerWidth <= 768);
+
+    // Se mudou de desktop para mobile ou vice-versa, ajusta a sidebar
+    if (this.isMobile() !== wasMobile) {
+      this.isSidebarOpen.set(!this.isMobile());
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarOpen.update(val => !val);

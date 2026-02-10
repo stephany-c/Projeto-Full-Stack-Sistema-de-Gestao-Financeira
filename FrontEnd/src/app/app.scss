@@ -16,8 +16,10 @@
 
     &.no-auth {
         background: #f0f2f5;
+
         .content {
             padding: 0;
+
             .page-container {
                 padding: 0;
             }
@@ -86,11 +88,11 @@
                 font-weight: 500;
             }
         }
-        
+
         .nav-spacer {
             height: 2rem;
         }
-        
+
         .logout-item {
             cursor: pointer;
             margin-top: auto;
@@ -143,5 +145,62 @@
     .page-container {
         padding: 2rem;
         flex: 1;
+
+        @media (max-width: 768px) {
+            padding: 1rem;
+        }
+    }
+}
+
+// Mobile Responsiveness
+@media (max-width: 768px) {
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+    }
+
+    .app-layout {
+        .sidebar {
+            width: 280px;
+            transform: translateX(0);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 10px 0 25px rgba(0, 0, 0, 0.3);
+
+            .label,
+            h1 {
+                display: block !important;
+            }
+        }
+
+        &.sidebar-closed {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+        }
+    }
+
+    .content {
+        header {
+            padding: 0 1rem;
+
+            .user-info {
+                font-size: 0.85rem;
+
+                strong {
+                    display: none;
+                }
+            }
+        }
     }
 }

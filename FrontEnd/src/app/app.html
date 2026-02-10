@@ -1,4 +1,5 @@
 <div class="app-layout" [class.sidebar-closed]="!isSidebarOpen()" [class.no-auth]="!authService.isAuthenticated()">
+  <div class="sidebar-backdrop" *ngIf="isSidebarOpen() && isMobile()" (click)="toggleSidebar()"></div>
   <aside class="sidebar" *ngIf="authService.isAuthenticated()">
     <div class="brand">
       <span class="logo"><i class="fa-solid fa-wallet"></i></span>

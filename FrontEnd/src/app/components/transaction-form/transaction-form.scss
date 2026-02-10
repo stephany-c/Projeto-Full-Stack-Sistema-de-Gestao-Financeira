@@ -195,3 +195,39 @@
         cursor: not-allowed;
     }
 }
+
+@media (max-width: 768px) {
+    .transaction-form-container {
+        padding: 1.5rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        .category-select-wrapper {
+            flex-direction: column;
+
+            .btn-quick-add {
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+        }
+
+        .quick-add-container {
+            flex-direction: column;
+
+            .btn-save-quick {
+                width: 100%;
+            }
+        }
+    }
+
+    .btn-submit {
+        padding: 1.25rem;
+    }
+}

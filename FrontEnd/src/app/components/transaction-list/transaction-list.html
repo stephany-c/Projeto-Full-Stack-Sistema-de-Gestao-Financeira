@@ -45,16 +45,16 @@
         </thead>
         <tbody>
             <tr *ngFor="let t of transactions()" [ngClass]="t.type.toLowerCase()">
-                <td>{{ t.date | date:'dd/MM/yyyy' }}</td>
-                <td>{{ t.description }}</td>
-                <td>
+                <td data-label="Data">{{ t.date | date:'dd/MM/yyyy' }}</td>
+                <td data-label="Descrição">{{ t.description }}</td>
+                <td data-label="Categoria">
                     <span class="category-badge">
                         {{ t.categoryName }}
                     </span>
                 </td>
-                <td>{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
-                <td>{{ t.amount | currency:'BRL' }}</td>
-                <td>
+                <td data-label="Tipo">{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
+                <td data-label="Valor">{{ t.amount | currency:'BRL' }}</td>
+                <td data-label="Ações">
                     <button class="btn-delete" (click)="deleteTransaction(t.id)"><i
                             class="fa-solid fa-trash-can"></i></button>
                 </td>
