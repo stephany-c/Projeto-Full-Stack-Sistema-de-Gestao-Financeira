@@ -2,11 +2,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 70vh;
     background: #0f172a;
     position: relative;
     overflow: hidden;
     font-family: 'Inter', -apple-system, sans-serif;
+    padding: 20px;
 }
 
 // Background Blobs
@@ -44,7 +45,7 @@
     .blob-3 {
         width: 250px;
         height: 250px;
-        background: #8b5cf6;
+        background: #746c86;
         top: 20%;
         left: 10%;
         animation-delay: -6s;
@@ -71,7 +72,7 @@
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    padding: 3rem;
+    padding: 1.5rem;
     border-radius: 28px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
     width: 100%;
