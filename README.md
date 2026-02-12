@@ -115,19 +115,9 @@ Acesse: **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-
 
 ---
 
-## 🤝 Contribuição
-
-1. Faça um Fork do projeto.
-2. Crie uma Branch para sua feature (`git checkout -b feature/nova-feature`).
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`).
-4. Push para a Branch (`git push origin feature/nova-feature`).
-5. Abra um Pull Request.
-
----
-
 ## 📄 Licença
 
 Este projeto está sob a licença [MIT](LICENSE).
 
 ---
-*Desenvolvido com 💙 por Stephany C.*
+*Desenvolvido por Stephany C.*
