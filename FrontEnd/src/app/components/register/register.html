@@ -19,7 +19,11 @@
                 <label>Nome Completo</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-user field-icon"></i>
-                    <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome completo">
+                    <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome completo"
+                        #name="ngModel">
+                </div>
+                <div *ngIf="name.invalid && (name.dirty || name.touched)" class="field-error">
+                    <small *ngIf="name.errors?.['required']">O nome é obrigatório.</small>
                 </div>
             </div>
 
@@ -27,8 +31,12 @@
                 <label>E-mail</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-envelope field-icon"></i>
-                    <input type="email" [(ngModel)]="user.email" name="email" required email
-                        placeholder="seu@email.com">
+                    <input type="email" [(ngModel)]="user.email" name="email" required email placeholder="seu@email.com"
+                        #email="ngModel">
+                </div>
+                <div *ngIf="email.invalid && (email.dirty || email.touched)" class="field-error">
+                    <small *ngIf="email.errors?.['required']">O e-mail é obrigatório.</small>
+                    <small *ngIf="email.errors?.['email']">E-mail inválido.</small>
                 </div>
             </div>
 
@@ -37,8 +45,33 @@
                 <div class="input-wrapper">
                     <i class="fa-solid fa-lock field-icon"></i>
                     <input type="password" [(ngModel)]="user.password" name="password" required minlength="6"
-                        placeholder="Crie uma senha forte">
+                        placeholder="Crie uma senha forte" #password="ngModel">
                 </div>
+                <div *ngIf="password.invalid && (password.dirty || password.touched)" class="field-error">
+                    <small *ngIf="password.errors?.['required']">A senha é obrigatória.</small>
+                    <small *ngIf="password.errors?.['minlength']">Mínimo de 6 caracteres.</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirmar Senha</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <input type="password" [(ngModel)]="user.confirmPassword" name="confirmPassword" required
+                        placeholder="Confirme sua senha" #confirmPassword="ngModel">
+                </div>
+                <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)"
+                    class="field-error">
+                    <small *ngIf="confirmPassword.errors?.['required']">A confirmação é obrigatória.</small>
+                </div>
+                <div *ngIf="user.password && user.confirmPassword && user.password !== user.confirmPassword"
+                    class="field-error">
+                    <small>As senhas não coincidem.</small>
+                </div>
+            </div>
+
+            <div *ngIf="registerForm.submitted && registerForm.invalid" class="form-error">
+                Preencha todos os campos obrigatórios.
             </div>
 
             <div *ngIf="errorMessage" class="error-message">

@@ -226,17 +226,35 @@ p {
 }
 
 .error-message {
-    background: #fef2f2;
-    color: #dc2626;
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    font-size: 0.85rem;
+    background: rgba(220, 38, 38, 0.1);
+    color: #ef4444;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    border: 1px solid #fee2e2;
-    text-align: left;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.form-error {
+    color: #ef4444;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.field-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    margin-left: 0.5rem;
+
+    small {
+        display: block;
+    }
 }
 
 .success-message {
