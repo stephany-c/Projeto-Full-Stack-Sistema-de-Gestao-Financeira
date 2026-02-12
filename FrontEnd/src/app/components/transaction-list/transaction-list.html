@@ -29,6 +29,11 @@
                 <option value="EXPENSE">Despesas</option>
             </select>
         </div>
+        <div class="filter-group search">
+            <label>Buscar:</label>
+            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyLocalFilters()"
+                placeholder="Descrição...">
+        </div>
         <button class="btn-clear" (click)="clearFilter()">Limpar</button>
     </div>
 
@@ -44,21 +49,64 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let t of transactions()" [ngClass]="t.type.toLowerCase()">
-                <td data-label="Data">{{ t.date | date:'dd/MM/yyyy' }}</td>
-                <td data-label="Descrição">{{ t.description }}</td>
-                <td data-label="Categoria">
-                    <span class="category-badge">
-                        {{ t.categoryName }}
-                    </span>
-                </td>
-                <td data-label="Tipo">{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
-                <td data-label="Valor">{{ t.amount | currency:'BRL' }}</td>
-                <td data-label="Ações">
-                    <button class="btn-delete" (click)="deleteTransaction(t.id)"><i
-                            class="fa-solid fa-trash-can"></i></button>
-                </td>
-            </tr>
+            <ng-container *ngFor="let t of transactions()">
+                <!-- View Mode -->
+                <tr *ngIf="editingTransactionId() !== t.id" [ngClass]="t.type.toLowerCase()">
+                    <td data-label="Data">{{ t.date | date:'dd/MM/yyyy' }}</td>
+                    <td data-label="Descrição">{{ t.description }}</td>
+                    <td data-label="Categoria">
+                        <span class="category-badge">
+                            {{ t.categoryName }}
+                        </span>
+                    </td>
+                    <td data-label="Tipo">{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
+                    <td data-label="Valor">{{ t.amount | currency:'BRL' }}</td>
+                    <td data-label="Ações">
+                        <div class="actions">
+                            <button class="btn-icon" (click)="startEdit(t)" title="Editar">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn-icon delete" (click)="deleteTransaction(t.id)" title="Excluir">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Edit Mode -->
+                <tr *ngIf="editingTransactionId() === t.id" class="edit-row">
+                    <td data-label="Data">
+                        <input type="date" [(ngModel)]="editData.date">
+                    </td>
+                    <td data-label="Descrição">
+                        <input type="text" [(ngModel)]="editData.description">
+                    </td>
+                    <td data-label="Categoria">
+                        <select [(ngModel)]="editData.categoryId">
+                            <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+                        </select>
+                    </td>
+                    <td data-label="Tipo">
+                        <select [(ngModel)]="editData.type">
+                            <option value="INCOME">Receita</option>
+                            <option value="EXPENSE">Despesa</option>
+                        </select>
+                    </td>
+                    <td data-label="Valor">
+                        <input type="number" [(ngModel)]="editData.amount" step="0.01">
+                    </td>
+                    <td data-label="Ações">
+                        <div class="actions">
+                            <button class="btn-sm btn-success" (click)="saveEdit()" title="Salvar">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                            <button class="btn-sm btn-secondary" (click)="cancelEdit()" title="Cancelar">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-container>
         </tbody>
     </table>
     <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>

@@ -13,5 +13,6 @@ public class TransactionResponseDTO {
     private BigDecimal amount;
     private LocalDate date;
     private TransactionType type;
+    private Long categoryId;
     private String categoryName;
 }

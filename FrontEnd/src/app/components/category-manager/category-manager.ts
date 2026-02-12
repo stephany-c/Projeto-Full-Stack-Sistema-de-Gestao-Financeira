@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryService, Category } from '../../services/category.service';
@@ -12,6 +12,13 @@ import { CategoryService, Category } from '../../services/category.service';
 })
 export class CategoryManagerComponent implements OnInit {
     categories = signal<Category[]>([]);
+    searchTerm = signal('');
+
+    // Computed signal for filtering
+    filteredCategories = computed(() => {
+        const term = this.searchTerm().toLowerCase();
+        return this.categories().filter(c => c.name.toLowerCase().includes(term));
+    });
 
     newCategoryName = '';
 

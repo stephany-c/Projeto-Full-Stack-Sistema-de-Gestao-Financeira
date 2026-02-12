@@ -9,5 +9,6 @@ export interface Transaction {
     amount: number;
     date: string;
     type: TransactionType;
+    categoryId?: number;
     categoryName: string;
 }

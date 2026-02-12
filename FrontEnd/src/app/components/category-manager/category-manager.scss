@@ -19,6 +19,25 @@ h2 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.search-bar {
+    margin-bottom: 1.5rem;
+
+    .form-input.search {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #edeff2;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+
+        &:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+    }
+}
+
 .form-input {
     padding: 0.8rem;
     border: 1px solid #ddd;

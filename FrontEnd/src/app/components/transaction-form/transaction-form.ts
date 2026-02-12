@@ -5,6 +5,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-transaction-form',
@@ -20,6 +21,8 @@ export class TransactionFormComponent implements OnInit {
     categories = signal<Category[]>([]);
     loading = signal<boolean>(false);
     hasCategories = signal<boolean>(true);
+    isEditing = signal<boolean>(false);
+    transactionId: number | null = null;
 
     isAddingCategory = signal<boolean>(false);
     newCategoryName = '';
@@ -28,7 +31,9 @@ export class TransactionFormComponent implements OnInit {
         private fb: FormBuilder,
         private transactionService: TransactionService,
         private categoryService: CategoryService,
-        private authService: AuthService
+        private authService: AuthService,
+        private route: ActivatedRoute,
+        private router: Router
     ) {
         this.transactionForm = this.fb.group({
             description: ['', [Validators.required, Validators.minLength(3)]],
@@ -47,6 +52,15 @@ export class TransactionFormComponent implements OnInit {
             this.transactionForm.patchValue({ userId });
             this.loadCategories(userId);
         }
+
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            if (id) {
+                this.isEditing.set(true);
+                this.transactionId = +id;
+                this.loadTransaction(this.transactionId);
+            }
+        });
     }
 
     loadCategories(userId: number): void {
@@ -58,14 +72,32 @@ export class TransactionFormComponent implements OnInit {
                 this.categories.set(data);
                 this.loading.set(false);
                 this.hasCategories.set(data.length > 0);
-                if (data.length > 0) {
+                if (data.length > 0 && !this.isEditing()) {
                     this.transactionForm.patchValue({ categoryId: data[0].id });
-                } else {
-                    console.warn('⚠️ No categories found for user:', userId);
                 }
             },
             error: (err: any) => {
                 console.error('❌ Error loading categories:', err);
+                this.loading.set(false);
+            }
+        });
+    }
+
+    loadTransaction(id: number): void {
+        this.loading.set(true);
+        this.transactionService.getById(id).subscribe({
+            next: (transaction: any) => {
+                this.transactionForm.patchValue({
+                    description: transaction.description,
+                    amount: transaction.amount,
+                    date: transaction.date,
+                    type: transaction.type,
+                    categoryId: transaction.categoryId
+                });
+                this.loading.set(false);
+            },
+            error: (err) => {
+                console.error('Error loading transaction:', err);
                 this.loading.set(false);
             }
         });
@@ -105,22 +137,31 @@ export class TransactionFormComponent implements OnInit {
             }
             const formValue = { ...this.transactionForm.value, userId };
 
-            this.transactionService.create(formValue).subscribe({
-                next: () => {
-                    this.transactionForm.reset({
-                        description: '',
-                        amount: 0,
-                        date: new Date().toISOString().split('T')[0],
-                        type: TransactionType.EXPENSE,
-                        categoryId: this.categories()[0]?.id,
-                        userId
-                    });
-                    this.transactionCreated.emit();
-                },
-                error: (err) => {
-                    console.error('Error creating transaction:', err);
-                }
-            });
+            if (this.isEditing() && this.transactionId) {
+                this.transactionService.update(this.transactionId, formValue).subscribe({
+                    next: () => {
+                        this.router.navigate(['/transactions']);
+                    },
+                    error: (err) => console.error('Error updating:', err)
+                });
+            } else {
+                this.transactionService.create(formValue).subscribe({
+                    next: () => {
+                        this.transactionForm.reset({
+                            description: '',
+                            amount: 0,
+                            date: new Date().toISOString().split('T')[0],
+                            type: TransactionType.EXPENSE,
+                            categoryId: this.categories()[0]?.id,
+                            userId
+                        });
+                        this.transactionCreated.emit();
+                    },
+                    error: (err) => {
+                        console.error('Error creating transaction:', err);
+                    }
+                });
+            }
         }
     }
 }

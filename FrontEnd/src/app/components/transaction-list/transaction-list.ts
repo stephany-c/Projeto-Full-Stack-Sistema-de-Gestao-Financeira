@@ -1,4 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
@@ -23,10 +24,12 @@ export class TransactionListComponent implements OnInit {
     endDate = signal('');
     selectedCategoryId = signal('');
     selectedType = signal('');
+    searchTerm = signal('');
 
     constructor(
         private transactionService: TransactionService,
-        private categoryService: CategoryService
+        private categoryService: CategoryService,
+        private router: Router
     ) { }
 
     ngOnInit(): void {
@@ -68,6 +71,11 @@ export class TransactionListComponent implements OnInit {
             filtered = filtered.filter(t => t.type === this.selectedType());
         }
 
+        if (this.searchTerm()) {
+            const term = this.searchTerm().toLowerCase();
+            filtered = filtered.filter(t => t.description.toLowerCase().includes(term));
+        }
+
         this.transactions.set(filtered);
     }
 
@@ -76,6 +84,7 @@ export class TransactionListComponent implements OnInit {
         this.endDate.set('');
         this.selectedCategoryId.set('');
         this.selectedType.set('');
+        this.searchTerm.set('');
         this.loadAll();
     }
 
@@ -86,5 +95,47 @@ export class TransactionListComponent implements OnInit {
                 this.applyLocalFilters();
             });
         }
+    }
+
+    editingTransactionId = signal<number | null>(null);
+    editData: Partial<Transaction> = {};
+
+    startEdit(transaction: Transaction): void {
+        if (!transaction.id) return;
+        this.editingTransactionId.set(transaction.id);
+        this.editData = { ...transaction };
+
+        // Fallback: If categoryId is missing but categoryName exists, try to find the ID
+        if (!this.editData.categoryId && this.editData.categoryName) {
+            const foundCat = this.categories().find(c => c.name === this.editData.categoryName);
+            if (foundCat) {
+                this.editData.categoryId = foundCat.id;
+            }
+        }
+
+        // Ensure date is in YYYY-MM-DD format for input
+        if (this.editData.date) {
+            this.editData.date = this.editData.date.split('T')[0];
+        }
+    }
+
+    saveEdit(): void {
+        const id = this.editingTransactionId();
+        if (id && this.editData) {
+            this.transactionService.update(id, this.editData).subscribe({
+                next: (updated) => {
+                    // Update the local list
+                    this.allTransactions = this.allTransactions.map(t => t.id === updated.id ? updated : t);
+                    this.applyLocalFilters();
+                    this.cancelEdit();
+                },
+                error: (err) => console.error('Error updating transaction:', err)
+            });
+        }
+    }
+
+    cancelEdit(): void {
+        this.editingTransactionId.set(null);
+        this.editData = {};
     }
 }

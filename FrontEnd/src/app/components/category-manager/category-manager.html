@@ -6,9 +6,14 @@
         <button (click)="addCategory()" class="btn-primary">Adicionar</button>
     </div>
 
+    <div class="search-bar">
+        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+            placeholder="Buscar categoria..." class="form-input search">
+    </div>
+
     <div class="category-list">
-        <div *ngFor="let category of categories()" class="category-item" [class.editing]="editingId() === category.id"
-            [class.deleting]="deletingId() === category.id">
+        <div *ngFor="let category of filteredCategories()" class="category-item"
+            [class.editing]="editingId() === category.id" [class.deleting]="deletingId() === category.id">
 
             <div *ngIf="editingId() === category.id; else otherModes" class="edit-mode">
                 <input [(ngModel)]="editName" class="form-input">

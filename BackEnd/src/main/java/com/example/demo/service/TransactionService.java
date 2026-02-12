@@ -59,6 +59,31 @@ public class TransactionService {
         return transactionMapper.toResponseDTO(saved);
     }
 
+    @Transactional(readOnly = true)
+    public TransactionResponseDTO findById(Long id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        return transactionMapper.toResponseDTO(transaction);
+    }
+
+    @Transactional
+    public TransactionResponseDTO update(Long id, TransactionRequestDTO dto) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        transaction.setDescription(dto.getDescription());
+        transaction.setAmount(dto.getAmount());
+        transaction.setDate(dto.getDate());
+        transaction.setType(dto.getType());
+        transaction.setCategory(category);
+
+        Transaction updated = transactionRepository.save(transaction);
+        return transactionMapper.toResponseDTO(updated);
+    }
+
     @Transactional
     public void delete(Long id) {
         if (!transactionRepository.existsById(id)) {
