@@ -164,4 +164,36 @@ export class TransactionFormComponent implements OnInit {
             }
         }
     }
+    formattedAmount = signal('');
+
+    onAmountInput(event: any): void {
+        const input = event.target;
+        // Remove non-numeric characters
+        let value = input.value.replace(/\D/g, '');
+
+        if (!value) {
+            this.transactionForm.patchValue({ amount: null });
+            this.formattedAmount.set('');
+            return;
+        }
+
+        // Convert to float (e.g. "1234" -> 12.34)
+        const floatValue = parseFloat(value) / 100;
+
+        // Update form control with numeric value
+        this.transactionForm.patchValue({ amount: floatValue });
+
+        // Format for display (e.g. "R$ 12,34")
+        const formatted = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(floatValue);
+
+        this.formattedAmount.set(formatted);
+        input.value = formatted;
+    }
+
+    onAmountBlur(): void {
+        this.transactionForm.get('amount')?.markAsTouched();
+    }
 }

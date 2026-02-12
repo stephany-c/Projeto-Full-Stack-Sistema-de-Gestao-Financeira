@@ -4,17 +4,41 @@
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
             <label>Descrição</label>
-            <input type="text" formControlName="description" placeholder="Ex: Salário, Aluguel...">
+            <input type="text" formControlName="description" placeholder="Ex: Salário, Aluguel..."
+                [class.invalid]="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
+            <small class="error-msg"
+                *ngIf="transactionForm.get('description')?.hasError('required') && transactionForm.get('description')?.touched">
+                A descrição é obrigatória.
+            </small>
+            <small class="error-msg"
+                *ngIf="transactionForm.get('description')?.hasError('minlength') && transactionForm.get('description')?.touched">
+                Mínimo de 3 caracteres.
+            </small>
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label>Valor (R$)</label>
-                <input type="number" formControlName="amount" step="0.01">
+                <input type="text" [value]="formattedAmount()" (input)="onAmountInput($event)" (blur)="onAmountBlur()"
+                    placeholder="R$ 0,00"
+                    [class.invalid]="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
+                <small class="error-msg"
+                    *ngIf="transactionForm.get('amount')?.hasError('required') && transactionForm.get('amount')?.touched">
+                    O valor é obrigatório.
+                </small>
+                <small class="error-msg"
+                    *ngIf="transactionForm.get('amount')?.hasError('min') && transactionForm.get('amount')?.touched">
+                    O valor deve ser maior que 0.
+                </small>
             </div>
             <div class="form-group">
                 <label>Data</label>
-                <input type="date" formControlName="date">
+                <input type="date" formControlName="date"
+                    [class.invalid]="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
+                <small class="error-msg"
+                    *ngIf="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
+                    A data é obrigatória.
+                </small>
             </div>
         </div>
 

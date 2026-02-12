@@ -98,7 +98,7 @@ export class TransactionListComponent implements OnInit {
     }
 
     editingTransactionId = signal<number | null>(null);
-    editData: Partial<Transaction> = {};
+    editData: any = {};
 
     startEdit(transaction: Transaction): void {
         if (!transaction.id) return;

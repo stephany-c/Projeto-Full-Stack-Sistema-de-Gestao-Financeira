@@ -43,6 +43,32 @@
         &::placeholder {
             color: #bdc3c7;
         }
+
+        &.invalid {
+            border-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+    }
+
+    .error-msg {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: -0.2rem;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .error-field {
