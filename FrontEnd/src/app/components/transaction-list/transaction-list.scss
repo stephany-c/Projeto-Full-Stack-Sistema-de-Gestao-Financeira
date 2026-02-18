@@ -215,13 +215,21 @@
 
 @media (max-width: 768px) {
     .transaction-list-container {
-        padding: 1rem;
+        padding: 1rem 0; // Remove horizontal padding
+        background: transparent; // Make it cleaner on mobile
+        box-shadow: none;
+    }
+
+    .header-actions {
+        padding: 0 1rem;
     }
 
     .filters {
         flex-direction: column;
         align-items: stretch;
         gap: 1rem;
+        padding: 0 1rem;
+        margin-bottom: 2rem;
 
         .filter-group {
             width: 100%;
@@ -233,41 +241,142 @@
     }
 
     .transaction-table {
+        width: 100% !important;
+        display: block;
+
+        tbody {
+            display: block;
+            width: 100%;
+        }
+
         thead {
             display: none;
         }
 
         tr {
-            display: block;
+            display: grid;
+            grid-template-areas:
+                "description amount"
+                "meta-date actions"
+                "meta-cat actions";
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto auto;
+            gap: 0.25rem 0.75rem;
+            width: 100%;
             background: #fff;
-            border: 1px solid #edeff2;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            padding: 1rem;
+            border-top: 1px solid #edeff2;
+            border-bottom: 1px solid #edeff2;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            margin-bottom: 0.5rem;
+            padding: 1.25rem 1rem;
             position: relative;
+            box-sizing: border-box;
+
+            &.edit-row {
+                display: block; // Keep edit row as blocks to fit inputs
+
+                td {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    text-align: left;
+                    padding: 0.5rem 0;
+
+                    &:before {
+                        content: attr(data-label);
+                        font-weight: 700;
+                        margin-bottom: 0.25rem;
+                        display: block;
+                    }
+
+                    input,
+                    select {
+                        width: 100%;
+                    }
+                }
+            }
         }
 
         td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
+            display: block;
+            padding: 0;
             border: none;
-            text-align: right;
+            text-align: left;
 
             &:before {
-                content: attr(data-label);
-                float: left;
-                font-weight: 600;
-                color: #7f8c8d;
-                font-size: 0.8rem;
-                text-transform: uppercase;
+                display: none; // Hide labels for modern view
             }
 
-            &:last-child {
-                border-top: 1px solid #f4f7f6;
-                margin-top: 0.5rem;
-                padding-top: 1rem;
+            // Description Area
+            &:nth-child(2) {
+                grid-area: description;
+                font-size: 1rem;
+                font-weight: 600;
+                color: #2c3e50;
+                margin-bottom: 0.25rem;
+            }
+
+            // Amount Area
+            &:nth-child(5) {
+                grid-area: amount;
+                font-size: 1.15rem;
+                text-align: right;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            // Date Area
+            &:nth-child(1) {
+                grid-area: meta-date;
+                font-size: 0.8rem;
+                color: #94a3b8;
+            }
+
+            // Category Area
+            &:nth-child(3) {
+                grid-area: meta-cat;
+                margin-top: 0.25rem;
+
+                .category-badge {
+                    font-size: 0.7rem;
+                    padding: 2px 8px;
+                    background: #f1f5f9;
+                }
+            }
+
+            // Hide Type in mobile as color/sign shows it
+            &:nth-child(4) {
+                display: none;
+            }
+
+            // Actions Area
+            &:nth-child(6) {
+                grid-area: actions;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+
+                .actions {
+                    gap: 0.5rem;
+
+                    .btn-icon {
+                        padding: 8px;
+                        background: #f8fafc;
+                        border-radius: 50%;
+                        width: 36px;
+                        height: 36px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        &.delete {
+                            color: #ef4444;
+                        }
+                    }
+                }
             }
         }
     }

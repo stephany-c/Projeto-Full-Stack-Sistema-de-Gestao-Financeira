@@ -2,12 +2,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 70vh;
+    min-height: 100vh;
     background: #0f172a;
     position: relative;
     overflow: hidden;
     font-family: 'Inter', -apple-system, sans-serif;
-    padding: 20px;
 }
 
 // Background Blobs
@@ -21,14 +20,14 @@
         position: absolute;
         border-radius: 50%;
         filter: blur(80px);
-        opacity: 0.5;
+        opacity: 0.6;
         animation: float 12s infinite ease-in-out;
     }
 
     .blob-1 {
         width: 450px;
         height: 450px;
-        background: #10b981; // Green for register
+        background: #10b98149; // Adjusted opacity matching login style
         top: -150px;
         right: -100px;
     }
@@ -45,7 +44,7 @@
     .blob-3 {
         width: 250px;
         height: 250px;
-        background: #746c86;
+        background: #66358f;
         top: 20%;
         left: 10%;
         animation-delay: -6s;
@@ -69,16 +68,16 @@
 }
 
 .auth-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 1.5rem;
-    border-radius: 28px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
-    max-width: 460px;
+    max-width: 440px;
     z-index: 2;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     text-align: center;
 }
 
@@ -109,7 +108,7 @@
 
 h1 {
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 700;
     color: #1e293b;
     margin-bottom: 0.5rem;
     letter-spacing: -1px;
@@ -131,9 +130,9 @@ p {
         margin-bottom: 0.5rem;
         color: #475569;
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.05em;
     }
 
     .input-wrapper {
@@ -143,17 +142,17 @@ p {
 
         .field-icon {
             position: absolute;
-            left: 1.1rem;
+            left: 1rem;
             color: #94a3b8;
             transition: color 0.3s;
         }
 
         input {
             width: 100%;
-            padding: 1rem 1rem 1rem 3.2rem;
-            background: white;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.9);
             border: 2px solid #e2e8f0;
-            border-radius: 14px;
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s;
             color: #1e293b;
@@ -161,6 +160,7 @@ p {
             &:focus {
                 outline: none;
                 border-color: #10b981;
+                background: white;
                 box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 
                 +.field-icon {
@@ -177,7 +177,7 @@ p {
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
@@ -207,7 +207,7 @@ p {
 }
 
 .auth-footer {
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     font-size: 0.9rem;
     color: #64748b;
 
@@ -226,16 +226,17 @@ p {
 }
 
 .error-message {
-    background: rgba(220, 38, 38, 0.1);
-    color: #ef4444;
-    padding: 0.75rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid rgba(220, 38, 38, 0.2);
+    border: 1px solid #fee2e2;
+    text-align: left;
 }
 
 .form-error {

@@ -147,7 +147,7 @@
         flex: 1;
 
         @media (max-width: 768px) {
-            padding: 1rem;
+            padding: 1rem 0; // Remove horizontal padding to allow full-width elements
         }
     }
 }
@@ -198,7 +198,7 @@
                 font-size: 0.85rem;
 
                 strong {
-                    display: none;
+                    display: inline;
                 }
             }
         }
