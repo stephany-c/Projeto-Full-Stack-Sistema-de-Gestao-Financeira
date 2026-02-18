@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Category {
     id: number;
@@ -12,7 +13,7 @@ export interface Category {
     providedIn: 'root'
 })
 export class CategoryService {
-    private apiUrl = 'http://localhost:8080/api/categories';
+    private apiUrl = `${environment.apiUrl}/categories`;
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -20,7 +21,7 @@ export class CategoryService {
         const userId = this.authService.getUserId();
         if (!userId) return new Observable(observer => observer.error('User not authenticated'));
 
-        console.log('🌐 CategoryService - Fetching categories for userId:', userId);
+        console.log('CategoryService - Fetching categories for userId:', userId);
         return this.http.get<Category[]>(`${this.apiUrl}/user/${userId}`);
     }
 
