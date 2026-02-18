@@ -19,12 +19,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                         "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
                         "AND (t.date BETWEEN :startDate AND :endDate) " +
                         "ORDER BY t.date DESC")
-        List<Transaction> findByFilters(
+        org.springframework.data.domain.Page<Transaction> findByFilters(
                         @org.springframework.data.repository.query.Param("user") User user,
                         @org.springframework.data.repository.query.Param("type") com.example.demo.entity.TransactionType type,
                         @org.springframework.data.repository.query.Param("categoryId") Long categoryId,
                         @org.springframework.data.repository.query.Param("startDate") LocalDate startDate,
-                        @org.springframework.data.repository.query.Param("endDate") LocalDate endDate);
+                        @org.springframework.data.repository.query.Param("endDate") LocalDate endDate,
+                        org.springframework.data.domain.Pageable pageable);
 
         @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
         @org.springframework.data.jpa.repository.Query("UPDATE Transaction t SET t.category.id = :newCategoryId WHERE t.category.id = :oldCategoryId")

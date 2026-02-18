@@ -17,8 +17,13 @@ import { AuthService } from '../../services/auth.service';
 export class TransactionListComponent implements OnInit {
     private authService = inject(AuthService);
     transactions = signal<Transaction[]>([]);
-    allTransactions: Transaction[] = []; // Cache para filtro local rápido
     categories = signal<Category[]>([]);
+
+    // Pagination signals
+    currentPage = signal(0);
+    pageSize = signal(10);
+    totalElements = signal(0);
+    totalPages = signal(0);
 
     startDate = signal('');
     endDate = signal('');
@@ -33,14 +38,22 @@ export class TransactionListComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.loadAll();
+        this.loadTransactions();
         this.loadCategories();
     }
 
-    loadAll(): void {
-        this.transactionService.getAll().subscribe(data => {
-            this.allTransactions = data;
-            this.applyLocalFilters();
+    loadTransactions(): void {
+        this.transactionService.getTransactions(
+            this.currentPage(),
+            this.pageSize(),
+            this.selectedType() || undefined,
+            this.selectedCategoryId() ? +this.selectedCategoryId() : undefined,
+            this.startDate() || undefined,
+            this.endDate() || undefined
+        ).subscribe(response => {
+            this.transactions.set(response.content);
+            this.totalElements.set(response.totalElements);
+            this.totalPages.set(response.totalPages);
         });
     }
 
@@ -49,34 +62,19 @@ export class TransactionListComponent implements OnInit {
     }
 
     applyFilter(): void {
-        if (this.startDate() && this.endDate()) {
-            this.transactionService.getByPeriod(this.startDate(), this.endDate())
-                .subscribe(data => {
-                    this.allTransactions = data;
-                    this.applyLocalFilters();
-                });
-        } else {
-            this.applyLocalFilters();
-        }
+        this.currentPage.set(0);
+        this.loadTransactions();
     }
 
-    applyLocalFilters(): void {
-        let filtered = [...this.allTransactions];
+    onPageChange(page: number): void {
+        this.currentPage.set(page);
+        this.loadTransactions();
+    }
 
-        if (this.selectedCategoryId()) {
-            filtered = filtered.filter(t => t.categoryName === this.categories().find(c => c.id === +this.selectedCategoryId())?.name);
-        }
-
-        if (this.selectedType()) {
-            filtered = filtered.filter(t => t.type === this.selectedType());
-        }
-
-        if (this.searchTerm()) {
-            const term = this.searchTerm().toLowerCase();
-            filtered = filtered.filter(t => t.description.toLowerCase().includes(term));
-        }
-
-        this.transactions.set(filtered);
+    onPageSizeChange(size: number): void {
+        this.pageSize.set(size);
+        this.currentPage.set(0);
+        this.loadTransactions();
     }
 
     clearFilter(): void {
@@ -85,14 +83,14 @@ export class TransactionListComponent implements OnInit {
         this.selectedCategoryId.set('');
         this.selectedType.set('');
         this.searchTerm.set('');
-        this.loadAll();
+        this.currentPage.set(0);
+        this.loadTransactions();
     }
 
     deleteTransaction(id: number | undefined): void {
         if (id && confirm('Deseja excluir esta transação?')) {
             this.transactionService.delete(id).subscribe(() => {
-                this.allTransactions = this.allTransactions.filter(t => t.id !== id);
-                this.applyLocalFilters();
+                this.loadTransactions(); // Refresh current page
             });
         }
     }
@@ -124,9 +122,7 @@ export class TransactionListComponent implements OnInit {
         if (id && this.editData) {
             this.transactionService.update(id, this.editData).subscribe({
                 next: (updated) => {
-                    // Update the local list
-                    this.allTransactions = this.allTransactions.map(t => t.id === updated.id ? updated : t);
-                    this.applyLocalFilters();
+                    this.loadTransactions(); // Refresh to ensure data consistency
                     this.cancelEdit();
                 },
                 error: (err) => console.error('Error updating transaction:', err)

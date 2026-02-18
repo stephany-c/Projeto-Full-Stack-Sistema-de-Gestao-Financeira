@@ -20,16 +20,22 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TransactionResponseDTO>> getAllByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(transactionService.findAllByUser(userId));
-    }
-
-    @GetMapping("/user/{userId}/filter")
-    public ResponseEntity<List<TransactionResponseDTO>> getByPeriod(
+    public ResponseEntity<org.springframework.data.domain.Page<TransactionResponseDTO>> getTransactions(
             @PathVariable Long userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(transactionService.findByUserAndPeriod(userId, startDate, endDate));
+            @RequestParam(required = false) com.example.demo.entity.TransactionType type,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        LocalDate finalStartDate = (startDate != null) ? startDate : LocalDate.of(2000, 1, 1);
+        LocalDate finalEndDate = (endDate != null) ? endDate : LocalDate.of(2099, 12, 31);
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+
+        return ResponseEntity.ok(transactionService.findByUserAndPeriod(
+                userId, type, categoryId, finalStartDate, finalEndDate, pageable));
     }
 
     @PostMapping

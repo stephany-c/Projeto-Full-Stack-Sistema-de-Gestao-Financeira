@@ -5,6 +5,14 @@ import { Transaction } from '../models/transaction.model';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
+export interface PaginatedResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -13,19 +21,27 @@ export class TransactionService {
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
-    getAll(): Observable<Transaction[]> {
+    getTransactions(
+        page: number = 0,
+        size: number = 10,
+        type?: string,
+        categoryId?: number,
+        startDate?: string,
+        endDate?: string
+    ): Observable<PaginatedResponse<Transaction>> {
         const userId = this.authService.getUserId();
         if (!userId) throw new Error('User not authenticated');
-        return this.http.get<Transaction[]>(`${this.apiUrl}/user/${userId}`);
-    }
 
-    getByPeriod(startDate: string, endDate: string): Observable<Transaction[]> {
-        const userId = this.authService.getUserId();
-        if (!userId) throw new Error('User not authenticated');
-        const params = new HttpParams()
-            .set('startDate', startDate)
-            .set('endDate', endDate);
-        return this.http.get<Transaction[]>(`${this.apiUrl}/user/${userId}/filter`, { params });
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+
+        if (type) params = params.set('type', type);
+        if (categoryId) params = params.set('categoryId', categoryId.toString());
+        if (startDate) params = params.set('startDate', startDate);
+        if (endDate) params = params.set('endDate', endDate);
+
+        return this.http.get<PaginatedResponse<Transaction>>(`${this.apiUrl}/user/${userId}`, { params });
     }
 
     create(transaction: Transaction): Observable<Transaction> {

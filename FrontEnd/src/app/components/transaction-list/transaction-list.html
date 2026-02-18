@@ -1,7 +1,7 @@
 <div class="transaction-list-container">
     <div class="header-actions">
         <h2>Transações</h2>
-        <a routerLink="/categories" class="btn-link">Gerenciar Categorias</a>
+
     </div>
 
     <div class="filters">
@@ -15,15 +15,14 @@
         </div>
         <div class="filter-group">
             <label>Categoria:</label>
-            <select [ngModel]="selectedCategoryId()"
-                (ngModelChange)="selectedCategoryId.set($event); applyLocalFilters()">
+            <select [ngModel]="selectedCategoryId()" (ngModelChange)="selectedCategoryId.set($event); applyFilter()">
                 <option value="">Todas</option>
                 <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
             </select>
         </div>
         <div class="filter-group">
             <label>Tipo:</label>
-            <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); applyLocalFilters()">
+            <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); applyFilter()">
                 <option value="">Todos</option>
                 <option value="INCOME">Receitas</option>
                 <option value="EXPENSE">Despesas</option>
@@ -31,7 +30,7 @@
         </div>
         <div class="filter-group search">
             <label>Buscar:</label>
-            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyLocalFilters()"
+            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyFilter()"
                 placeholder="Descrição...">
         </div>
         <button class="btn-clear" (click)="clearFilter()">Limpar</button>
@@ -109,5 +108,31 @@
             </ng-container>
         </tbody>
     </table>
+
+    <div class="pagination-footer" *ngIf="transactions().length > 0">
+        <div class="pagination-info">
+            Mostrando {{ transactions().length }} de {{ totalElements() }} resultados
+        </div>
+        <div class="pagination-controls">
+            <button class="btn-page" [disabled]="currentPage() === 0" (click)="onPageChange(currentPage() - 1)">
+                <i class="fa-solid fa-chevron-left"></i> Anterior
+            </button>
+            <span class="page-indicator">Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
+            <button class="btn-page" [disabled]="currentPage() >= totalPages() - 1"
+                (click)="onPageChange(currentPage() + 1)">
+                Próximo <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="page-size-selector">
+            <label>Itens por página:</label>
+            <select [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+                <option [value]="5">5</option>
+                <option [value]="10">10</option>
+                <option [value]="20">20</option>
+                <option [value]="50">50</option>
+            </select>
+        </div>
+    </div>
+
     <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
 </div>

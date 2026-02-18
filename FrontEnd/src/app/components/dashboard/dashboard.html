@@ -25,11 +25,11 @@
   <div class="charts-container">
     <div class="chart-box">
       <h3>Receitas vs Despesas</h3>
-      <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="'pie'"></canvas>
+      <canvas baseChart [data]="pieChartData()" [options]="pieChartOptions" [type]="'pie'"></canvas>
     </div>
     <div class="chart-box">
       <h3>Despesas por Categoria</h3>
-      <canvas baseChart [data]="categoryChartData" [options]="pieChartOptions" [type]="'doughnut'"></canvas>
+      <canvas baseChart [data]="categoryChartData()" [options]="pieChartOptions" [type]="'doughnut'"></canvas>
     </div>
   </div>
 </div>

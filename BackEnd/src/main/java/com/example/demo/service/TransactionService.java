@@ -37,13 +37,18 @@ public class TransactionService {
         }
 
         @Transactional(readOnly = true)
-        public List<TransactionResponseDTO> findByUserAndPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
+        public org.springframework.data.domain.Page<TransactionResponseDTO> findByUserAndPeriod(
+                        Long userId,
+                        com.example.demo.entity.TransactionType type,
+                        Long categoryId,
+                        LocalDate startDate,
+                        LocalDate endDate,
+                        org.springframework.data.domain.Pageable pageable) {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
-                return transactionRepository.findByUserAndDateBetweenOrderByDateDesc(user, startDate, endDate)
-                                .stream()
-                                .map(transactionMapper::toResponseDTO)
-                                .collect(Collectors.toList());
+
+                return transactionRepository.findByFilters(user, type, categoryId, startDate, endDate, pageable)
+                                .map(transactionMapper::toResponseDTO);
         }
 
         @Transactional

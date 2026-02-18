@@ -29,7 +29,7 @@ export class DashboardComponent implements OnInit {
         }
     };
 
-    public pieChartData: ChartData<'pie', number[], string | string[]> = {
+    pieChartData = signal<ChartData<'pie', number[], string | string[]>>({
         labels: ['Receitas', 'Despesas'],
         datasets: [{
             data: [0, 0],
@@ -37,16 +37,16 @@ export class DashboardComponent implements OnInit {
             hoverBackgroundColor: ['#4caf50', '#ef5350'],
             borderWidth: 0
         }]
-    };
+    });
 
-    public categoryChartData: ChartData<'doughnut', number[], string | string[]> = {
+    categoryChartData = signal<ChartData<'doughnut', number[], string | string[]>>({
         labels: [],
         datasets: [{
             data: [],
-            backgroundColor: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#34495e'],
+            backgroundColor: [],
             borderWidth: 0
         }]
-    };
+    });
 
     constructor(private transactionService: TransactionService) { }
 
@@ -55,10 +55,25 @@ export class DashboardComponent implements OnInit {
     }
 
     loadData(): void {
-        this.transactionService.getAll().subscribe(data => {
+        // Request large enough sample to cover current month charts
+        this.transactionService.getTransactions(0, 1000).subscribe(response => {
+            const data = response.content;
             this.transactions.set(data);
             this.calculateSummary(data);
         });
+    }
+
+    private generateColors(count: number): string[] {
+        const baseColors = ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#34495e', '#e74c3c', '#2ecc71'];
+        if (count <= baseColors.length) return baseColors.slice(0, count);
+
+        // Generate more colors if needed
+        const colors = [...baseColors];
+        for (let i = baseColors.length; i < count; i++) {
+            const hue = (i * 137.5) % 360; // Golden angle for even distribution
+            colors.push(`hsl(${hue}, 70%, 60%)`);
+        }
+        return colors;
     }
 
     calculateSummary(data: Transaction[]): void {
@@ -82,11 +97,12 @@ export class DashboardComponent implements OnInit {
                 if (isCurrentMonth) mIncome += t.amount;
             } else {
                 expense += t.amount;
-                if (isCurrentMonth) mExpense += t.amount;
-
-                // Category summary for doughnut chart
-                const catName = t.categoryName || 'Outros';
-                categoryMap.set(catName, (categoryMap.get(catName) || 0) + t.amount);
+                if (isCurrentMonth) {
+                    mExpense += t.amount;
+                    // Only sum categories for current month to match cards
+                    const catName = t.categoryName || 'Outros';
+                    categoryMap.set(catName, (categoryMap.get(catName) || 0) + t.amount);
+                }
             }
         });
 
@@ -95,24 +111,25 @@ export class DashboardComponent implements OnInit {
         this.balance.set(income - expense);
         this.monthlyResult.set(mIncome - mExpense);
 
-        // Update Pie Chart
-        this.pieChartData = {
+        // Update Pie Chart Signal
+        this.pieChartData.set({
             labels: ['Receitas', 'Despesas'],
             datasets: [{
                 data: [income, expense],
                 backgroundColor: ['#2e7d32', '#c62828'],
                 borderWidth: 0
             }]
-        };
+        });
 
-        // Update Category Chart
-        this.categoryChartData = {
-            labels: Array.from(categoryMap.keys()),
+        // Update Category Chart Signal
+        const categories = Array.from(categoryMap.keys());
+        this.categoryChartData.set({
+            labels: categories,
             datasets: [{
                 data: Array.from(categoryMap.values()),
-                backgroundColor: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#34495e'],
+                backgroundColor: this.generateColors(categories.length),
                 borderWidth: 0
             }]
-        };
+        });
     }
 }
