@@ -26,8 +26,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                         @org.springframework.data.repository.query.Param("startDate") LocalDate startDate,
                         @org.springframework.data.repository.query.Param("endDate") LocalDate endDate);
 
-        @org.springframework.data.jpa.repository.Modifying
+        @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
         @org.springframework.data.jpa.repository.Query("UPDATE Transaction t SET t.category.id = :newCategoryId WHERE t.category.id = :oldCategoryId")
         void updateCategory(@org.springframework.data.repository.query.Param("oldCategoryId") Long oldCategoryId,
                         @org.springframework.data.repository.query.Param("newCategoryId") Long newCategoryId);
+
+        @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
+        @org.springframework.data.jpa.repository.Query("DELETE FROM Transaction t WHERE t.category.id = :categoryId")
+        void deleteByCategoryId(@org.springframework.data.repository.query.Param("categoryId") Long categoryId);
 }

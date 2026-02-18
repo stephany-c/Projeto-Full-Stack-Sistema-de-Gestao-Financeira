@@ -70,6 +70,8 @@ public class CategoryService {
 
         if (transferToCategoryId != null) {
             transactionRepository.updateCategory(categoryId, transferToCategoryId);
+        } else {
+            transactionRepository.deleteByCategoryId(categoryId);
         }
 
         categoryRepository.delete(category);
