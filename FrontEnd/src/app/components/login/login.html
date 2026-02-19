@@ -28,8 +28,13 @@
                 <label>Senha</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-lock field-icon"></i>
-                    <input type="password" [(ngModel)]="credentials.password" name="password" required
-                        placeholder="Sua senha">
+                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password"
+                        name="password" required placeholder="Sua senha" (focus)="passwordFocused = true"
+                        (blur)="passwordFocused = false">
+                    <button *ngIf="passwordFocused" type="button" class="toggle-password"
+                        (mousedown)="togglePassword($event)">
+                        <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                    </button>
                 </div>
             </div>
 

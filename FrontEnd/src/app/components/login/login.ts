@@ -14,8 +14,15 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   credentials = { email: '', password: '' };
   errorMessage = '';
+  showPassword = false;
+  passwordFocused = false;
 
   constructor(private authService: AuthService, private router: Router) { }
+
+  togglePassword(event: Event) {
+    event.preventDefault();
+    this.showPassword = !this.showPassword;
+  }
 
   onLogin() {
     this.authService.login(this.credentials).subscribe({

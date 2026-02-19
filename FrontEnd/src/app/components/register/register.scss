@@ -149,7 +149,7 @@ p {
 
         input {
             width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
+            padding: 1rem 3rem 1rem 3rem;
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #e2e8f0;
             border-radius: 12px;
@@ -166,6 +166,24 @@ p {
                 +.field-icon {
                     color: #10b981;
                 }
+            }
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+
+            &:hover {
+                color: #10b981;
             }
         }
     }
