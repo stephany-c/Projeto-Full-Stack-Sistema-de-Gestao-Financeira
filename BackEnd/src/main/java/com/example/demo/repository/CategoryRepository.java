@@ -13,6 +13,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByUser_Id(Long userId);
 
+    boolean existsByNameIgnoreCaseAndUser_Id(String name, Long userId);
+
     @org.springframework.data.jpa.repository.Query("SELECT c FROM Category c WHERE c.user.id = :userId OR c.user IS NULL")
     List<Category> findAllByUserIdOrGlobal(Long userId);
 

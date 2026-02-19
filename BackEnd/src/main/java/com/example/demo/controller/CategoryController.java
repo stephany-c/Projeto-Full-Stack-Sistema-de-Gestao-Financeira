@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,14 +24,22 @@ public class CategoryController {
     }
 
     @PostMapping("/user/{userId}")
-    public CategoryResponseDTO create(@RequestBody CategoryRequestDTO dto, @PathVariable Long userId) {
-        return categoryService.create(dto, userId);
+    public ResponseEntity<?> create(@RequestBody CategoryRequestDTO dto, @PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(categoryService.create(dto, userId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}/user/{userId}")
-    public CategoryResponseDTO update(@PathVariable Long id, @RequestBody CategoryRequestDTO dto,
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody CategoryRequestDTO dto,
             @PathVariable Long userId) {
-        return categoryService.update(id, dto, userId);
+        try {
+            return ResponseEntity.ok(categoryService.update(id, dto, userId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}/user/{userId}")

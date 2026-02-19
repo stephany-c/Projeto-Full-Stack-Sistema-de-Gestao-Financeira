@@ -4,6 +4,7 @@ import com.example.demo.dto.CategoryRequestDTO;
 import com.example.demo.dto.CategoryResponseDTO;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.repository.UserRepository;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -35,6 +37,12 @@ public class CategoryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        log.info("Checking if category exists: {} for user: {}", dto.getName(), userId);
+        if (categoryRepository.existsByNameIgnoreCaseAndUser_Id(dto.getName(), userId)) {
+            log.warn("Category already exists: {} for user: {}", dto.getName(), userId);
+            throw new IllegalArgumentException("Você já possui uma categoria com este nome.");
+        }
+
         Category category = Category.builder()
                 .name(dto.getName())
                 .user(user)
@@ -51,6 +59,11 @@ public class CategoryService {
 
         if (!category.getUser().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized");
+        }
+
+        if (!category.getName().equalsIgnoreCase(dto.getName()) &&
+                categoryRepository.existsByNameIgnoreCaseAndUser_Id(dto.getName(), userId)) {
+            throw new IllegalArgumentException("Você já possui uma categoria com este nome.");
         }
 
         category.setName(dto.getName());

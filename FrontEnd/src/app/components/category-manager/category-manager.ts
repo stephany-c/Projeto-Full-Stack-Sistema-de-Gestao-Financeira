@@ -28,6 +28,8 @@ export class CategoryManagerComponent implements OnInit {
     deletingId = signal<number | null>(null);
     transferToId: number | null = null;
 
+    errorMessage = signal<string | null>(null);
+
     private categoryService = inject(CategoryService);
 
     ngOnInit() {
@@ -40,10 +42,18 @@ export class CategoryManagerComponent implements OnInit {
 
     addCategory() {
         if (!this.newCategoryName.trim()) return;
+        this.errorMessage.set(null);
 
-        this.categoryService.create(this.newCategoryName).subscribe(() => {
-            this.newCategoryName = '';
-            this.loadCategories();
+        this.categoryService.create(this.newCategoryName).subscribe({
+            next: () => {
+                this.newCategoryName = '';
+                this.loadCategories();
+            },
+            error: (err) => {
+                console.error('Error adding category:', err);
+                const msg = err.error?.error || 'Erro ao adicionar categoria.';
+                this.errorMessage.set(msg);
+            }
         });
     }
 
@@ -59,10 +69,18 @@ export class CategoryManagerComponent implements OnInit {
 
     saveEdit(id: number) {
         if (!this.editName.trim()) return;
+        this.errorMessage.set(null);
 
-        this.categoryService.update(id, this.editName).subscribe(() => {
-            this.cancelEdit();
-            this.loadCategories();
+        this.categoryService.update(id, this.editName).subscribe({
+            next: () => {
+                this.cancelEdit();
+                this.loadCategories();
+            },
+            error: (err) => {
+                console.error('Error updating category:', err);
+                const msg = err.error?.error || 'Erro ao atualizar categoria.';
+                this.errorMessage.set(msg);
+            }
         });
     }
 
