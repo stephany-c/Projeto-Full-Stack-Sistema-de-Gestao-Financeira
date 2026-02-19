@@ -5,7 +5,7 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <div class="auth-card">
+    <mat-card class="auth-card">
         <div class="brand-header">
             <span class="logo-icon"><i class="fa-solid fa-wallet"></i></span>
             <h2>FinançaX</h2>
@@ -14,42 +14,39 @@
         <h1>Bem-vindo!</h1>
         <p>Acesse sua conta para organizar suas finanças.</p>
 
-        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
-            <div class="form-group">
-                <label>E-mail</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-envelope field-icon"></i>
-                    <input type="email" [(ngModel)]="credentials.email" name="email" required email
-                        placeholder="seu@email.com">
-                </div>
-            </div>
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>E-mail</mat-label>
+                <mat-icon matPrefix>email</mat-icon>
+                <input matInput type="email" [(ngModel)]="credentials.email" name="email" required email
+                    placeholder="seu@email.com">
+            </mat-form-field>
 
-            <div class="form-group">
-                <label>Senha</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock field-icon"></i>
-                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password"
-                        name="password" required placeholder="Sua senha" (focus)="passwordFocused = true"
-                        (blur)="passwordFocused = false">
-                    <button *ngIf="passwordFocused" type="button" class="toggle-password"
-                        (mousedown)="togglePassword($event)">
-                        <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                    </button>
-                </div>
-            </div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Senha</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password"
+                    name="password" required placeholder="Sua senha" (focus)="passwordFocused = true"
+                    (blur)="passwordFocused = false">
+                <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
+                    *ngIf="passwordFocused">
+                    <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+            </mat-form-field>
 
             <div *ngIf="errorMessage" class="error-message">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
             </div>
 
-            <button type="submit" class="btn-primary" [disabled]="!loginForm.form.valid">
+            <button mat-flat-button color="primary" type="submit" class="btn-primary"
+                [disabled]="!loginForm.form.valid">
                 <span>Entrar</span>
-                <i class="fa-solid fa-arrow-right"></i>
+                <mat-icon iconPositionEnd>arrow_forward</mat-icon>
             </button>
         </form>
 
         <div class="auth-footer">
             Ainda não tem conta? <a routerLink="/register">Criar conta</a>
         </div>
-    </div>
+    </mat-card>
 </div>

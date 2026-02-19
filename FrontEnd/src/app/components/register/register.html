@@ -5,84 +5,51 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <div class="auth-card">
+    <mat-card class="auth-card">
         <div class="brand-header">
             <span class="logo-icon"><i class="fa-solid fa-wallet"></i></span>
             <h2>FinançaX</h2>
         </div>
 
-        <h1>Criar Conta</h1>
-        <p>Comece a controlar sua vida financeira hoje.</p>
+        <h1>Crie sua conta</h1>
+        <p>Junte-se a nós e comece a organizar sua vida financeira.</p>
 
-        <form (ngSubmit)="onRegister()" #registerForm="ngForm">
-            <div class="form-group">
-                <label>Nome Completo</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-user field-icon"></i>
-                    <input type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome completo"
-                        #name="ngModel">
-                </div>
-                <div *ngIf="name.invalid && (name.dirty || name.touched)" class="field-error">
-                    <small *ngIf="name.errors?.['required']">O nome é obrigatório.</small>
-                </div>
-            </div>
+        <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="login-form">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nome Completo</mat-label>
+                <mat-icon matPrefix>person</mat-icon>
+                <input matInput type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome">
+            </mat-form-field>
 
-            <div class="form-group">
-                <label>E-mail</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-envelope field-icon"></i>
-                    <input type="email" [(ngModel)]="user.email" name="email" required email placeholder="seu@email.com"
-                        #email="ngModel">
-                </div>
-                <div *ngIf="email.invalid && (email.dirty || email.touched)" class="field-error">
-                    <small *ngIf="email.errors?.['required']">O e-mail é obrigatório.</small>
-                    <small *ngIf="email.errors?.['email']">E-mail inválido.</small>
-                </div>
-            </div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>E-mail</mat-label>
+                <mat-icon matPrefix>email</mat-icon>
+                <input matInput type="email" [(ngModel)]="user.email" name="email" required email
+                    placeholder="seu@email.com">
+            </mat-form-field>
 
-            <div class="form-group">
-                <label>Senha</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock field-icon"></i>
-                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" name="password"
-                        required minlength="6" placeholder="Crie uma senha forte" #password="ngModel"
-                        (focus)="passwordFocused = true" (blur)="passwordFocused = false">
-                    <button *ngIf="passwordFocused" type="button" class="toggle-password"
-                        (mousedown)="togglePassword($event)">
-                        <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                    </button>
-                </div>
-                <div *ngIf="password.invalid && (password.dirty || password.touched)" class="field-error">
-                    <small *ngIf="password.errors?.['required']">A senha é obrigatória.</small>
-                    <small *ngIf="password.errors?.['minlength']">Mínimo de 6 caracteres.</small>
-                </div>
-            </div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Senha</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" name="password"
+                    required placeholder="Sua senha" (focus)="passwordFocused = true" (blur)="passwordFocused = false">
+                <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
+                    *ngIf="passwordFocused">
+                    <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+            </mat-form-field>
 
-            <div class="form-group">
-                <label>Confirmar Senha</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock field-icon"></i>
-                    <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="user.confirmPassword"
-                        name="confirmPassword" required placeholder="Confirme sua senha" #confirmPassword="ngModel"
-                        (focus)="confirmPasswordFocused = true" (blur)="confirmPasswordFocused = false">
-                    <button *ngIf="confirmPasswordFocused" type="button" class="toggle-password"
-                        (mousedown)="toggleConfirmPassword($event)">
-                        <i class="fa-solid" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                    </button>
-                </div>
-                <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)"
-                    class="field-error">
-                    <small *ngIf="confirmPassword.errors?.['required']">A confirmação é obrigatória.</small>
-                </div>
-                <div *ngIf="user.password && user.confirmPassword && user.password !== user.confirmPassword"
-                    class="field-error">
-                    <small>As senhas não coincidem.</small>
-                </div>
-            </div>
-
-            <div *ngIf="registerForm.submitted && registerForm.invalid" class="form-error">
-                Preencha todos os campos obrigatórios.
-            </div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirmar Senha</mat-label>
+                <mat-icon matPrefix>lock_reset</mat-icon>
+                <input matInput [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="user.confirmPassword"
+                    name="confirmPassword" required placeholder="Repita sua senha"
+                    (focus)="confirmPasswordFocused = true" (blur)="confirmPasswordFocused = false">
+                <button mat-icon-button matSuffix type="button" (mousedown)="toggleConfirmPassword($event)"
+                    *ngIf="confirmPasswordFocused">
+                    <mat-icon>{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+            </mat-form-field>
 
             <div *ngIf="errorMessage" class="error-message">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
@@ -92,14 +59,15 @@
                 <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
             </div>
 
-            <button type="submit" class="btn-primary" [disabled]="!registerForm.form.valid">
-                <span>Cadastrar</span>
-                <i class="fa-solid fa-user-plus"></i>
+            <button mat-flat-button color="primary" type="submit" class="btn-primary"
+                [disabled]="!registerForm.form.valid">
+                <span>Criar Conta</span>
+                <mat-icon iconPositionEnd>person_add</mat-icon>
             </button>
         </form>
 
         <div class="auth-footer">
-            Já possui conta? <a routerLink="/login">Ir para o login</a>
+            Já tem uma conta? <a routerLink="/login">Fazer login</a>
         </div>
-    </div>
+    </mat-card>
 </div>
