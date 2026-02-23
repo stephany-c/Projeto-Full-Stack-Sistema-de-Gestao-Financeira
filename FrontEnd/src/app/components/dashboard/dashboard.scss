@@ -2,40 +2,44 @@
     padding: 2rem;
 
     h2 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         margin-bottom: 2rem;
         color: #2c3e50;
         font-weight: 700;
         font-size: 1.8rem;
+
+        .title-icon {
+            font-size: 1.8rem;
+        }
     }
 }
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .summary-card {
-    padding: 1.5rem;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s;
 
     &:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px);
     }
 
-    h3 {
-        font-size: 0.9rem;
+    .card-label {
+        font-size: 0.85rem;
         color: #7f8c8d;
-        margin-bottom: 0.5rem;
         font-weight: 600;
         text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 0.5rem;
     }
 
-    p {
+    .card-value {
         font-size: 1.8rem;
         font-weight: 700;
         color: #2c3e50;
@@ -51,58 +55,31 @@
     }
 
     &.balance {
-        border-left: 6px solid #3498db;
+        border-left: 5px solid #3498db;
     }
 
     &.monthly {
-        border-left: 6px solid #f1c40f;
+        border-left: 5px solid #f1c40f;
     }
 
     &.income {
-        border-left: 6px solid #2ecc71;
+        border-left: 5px solid #2ecc71;
     }
 
     &.expense {
-        border-left: 6px solid #e74c3c;
+        border-left: 5px solid #e74c3c;
     }
 }
 
-.charts-container {
+.charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
     gap: 2rem;
 
-    .chart-box {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        h3 {
-            align-self: flex-start;
-            margin-bottom: 2rem;
-            color: #2c3e50;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
+    .chart-card {
         canvas {
             max-width: 100% !important;
             max-height: 300px !important;
-        }
-    }
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-
-        .chart-box {
-            padding: 1rem;
-            min-height: 300px;
         }
     }
 }
@@ -119,14 +96,15 @@
 
     .summary-grid {
         gap: 1rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .summary-card {
-        padding: 1.25rem;
+    .summary-card .card-value {
+        font-size: 1.5rem;
+    }
 
-        p {
-            font-size: 1.5rem;
-        }
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }

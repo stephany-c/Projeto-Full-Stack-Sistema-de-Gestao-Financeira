@@ -6,11 +6,22 @@ import { TransactionService } from '../../services/transaction.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-transaction-list',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule, FormsModule,
+        MatFormFieldModule, MatInputModule, MatSelectModule,
+        MatButtonModule, MatIconModule, MatPaginatorModule, MatDatepickerModule
+    ],
     templateUrl: './transaction-list.html',
     styleUrl: './transaction-list.scss'
 })
@@ -25,8 +36,8 @@ export class TransactionListComponent implements OnInit {
     totalElements = signal(0);
     totalPages = signal(0);
 
-    startDate = signal('');
-    endDate = signal('');
+    startDate = signal<any>('');
+    endDate = signal<any>('');
     selectedCategoryId = signal('');
     selectedType = signal('');
     searchTerm = signal('');
@@ -37,19 +48,27 @@ export class TransactionListComponent implements OnInit {
         private router: Router
     ) { }
 
+
     ngOnInit(): void {
         this.loadTransactions();
         this.loadCategories();
     }
 
     loadTransactions(): void {
+        const start = this.startDate();
+        const end = this.endDate();
+
+        // Convert Date objects to YYYY-MM-DD if they are Dates (from range picker)
+        const startDateStr = start instanceof Date ? start.toISOString().split('T')[0] : start;
+        const endDateStr = end instanceof Date ? end.toISOString().split('T')[0] : end;
+
         this.transactionService.getTransactions(
             this.currentPage(),
             this.pageSize(),
             this.selectedType() || undefined,
             this.selectedCategoryId() ? +this.selectedCategoryId() : undefined,
-            this.startDate() || undefined,
-            this.endDate() || undefined
+            startDateStr || undefined,
+            endDateStr || undefined
         ).subscribe(response => {
             this.transactions.set(response.content);
             this.totalElements.set(response.totalElements);
@@ -74,6 +93,12 @@ export class TransactionListComponent implements OnInit {
     onPageSizeChange(size: number): void {
         this.pageSize.set(size);
         this.currentPage.set(0);
+        this.loadTransactions();
+    }
+
+    onMatPageChange(event: PageEvent): void {
+        this.pageSize.set(event.pageSize);
+        this.currentPage.set(event.pageIndex);
         this.loadTransactions();
     }
 

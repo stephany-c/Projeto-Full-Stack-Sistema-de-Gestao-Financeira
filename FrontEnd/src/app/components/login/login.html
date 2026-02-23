@@ -1,10 +1,4 @@
 <div class="auth-container">
-    <div class="auth-background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
-
     <mat-card class="auth-card">
         <div class="brand-header">
             <span class="logo-icon"><i class="fa-solid fa-wallet"></i></span>
@@ -14,7 +8,7 @@
         <h1>Bem-vindo!</h1>
         <p>Acesse sua conta para organizar suas finanças.</p>
 
-        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="auth-form">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>E-mail</mat-label>
                 <mat-icon matPrefix>email</mat-icon>
@@ -34,9 +28,9 @@
                 </button>
             </mat-form-field>
 
-            <div *ngIf="errorMessage" class="error-message">
+            <mat-error *ngIf="errorMessage">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
-            </div>
+            </mat-error>
 
             <button mat-flat-button color="primary" type="submit" class="btn-primary"
                 [disabled]="!loginForm.form.valid">

@@ -1,39 +1,49 @@
 <div class="transaction-list-container">
     <div class="header-actions">
         <h2>Transações</h2>
-
     </div>
 
     <div class="filters">
-        <div class="filter-group">
-            <label>De:</label>
-            <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); applyFilter()">
-        </div>
-        <div class="filter-group">
-            <label>Até:</label>
-            <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); applyFilter()">
-        </div>
-        <div class="filter-group">
-            <label>Categoria:</label>
-            <select [ngModel]="selectedCategoryId()" (ngModelChange)="selectedCategoryId.set($event); applyFilter()">
-                <option value="">Todas</option>
-                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label>Tipo:</label>
-            <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); applyFilter()">
-                <option value="">Todos</option>
-                <option value="INCOME">Receitas</option>
-                <option value="EXPENSE">Despesas</option>
-            </select>
-        </div>
-        <div class="filter-group search">
-            <label>Buscar:</label>
-            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyFilter()"
+        <mat-form-field appearance="outline" class="range-field">
+            <mat-label>Período</mat-label>
+            <mat-date-range-input [rangePicker]="rangePicker">
+                <input matStartDate [ngModel]="startDate()" (ngModelChange)="startDate.set($event); applyFilter()"
+                    placeholder="Início">
+                <input matEndDate [ngModel]="endDate()" (ngModelChange)="endDate.set($event); applyFilter()"
+                    placeholder="Fim">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #rangePicker></mat-date-range-picker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Categoria</mat-label>
+            <mat-select [ngModel]="selectedCategoryId()"
+                (ngModelChange)="selectedCategoryId.set($event); applyFilter()">
+                <mat-option value="">Todas</mat-option>
+                <mat-option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); applyFilter()">
+                <mat-option value="">Todos</mat-option>
+                <mat-option value="INCOME">Receitas</mat-option>
+                <mat-option value="EXPENSE">Despesas</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyFilter()"
                 placeholder="Descrição...">
-        </div>
-        <button class="btn-clear" (click)="clearFilter()">Limpar</button>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="clearFilter()">
+            <mat-icon>clear</mat-icon> Limpar
+        </button>
     </div>
 
     <table class="transaction-table">
@@ -54,19 +64,17 @@
                     <td data-label="Data">{{ t.date | date:'dd/MM/yyyy' }}</td>
                     <td data-label="Descrição">{{ t.description }}</td>
                     <td data-label="Categoria">
-                        <span class="category-badge">
-                            {{ t.categoryName }}
-                        </span>
+                        <span class="category-badge">{{ t.categoryName }}</span>
                     </td>
                     <td data-label="Tipo">{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
                     <td data-label="Valor">{{ t.amount | currency:'BRL' }}</td>
                     <td data-label="Ações">
                         <div class="actions">
-                            <button class="btn-icon" (click)="startEdit(t)" title="Editar">
-                                <i class="fa-solid fa-pen-to-square"></i>
+                            <button mat-icon-button (click)="startEdit(t)" title="Editar" color="primary">
+                                <mat-icon>edit</mat-icon>
                             </button>
-                            <button class="btn-icon delete" (click)="deleteTransaction(t.id)" title="Excluir">
-                                <i class="fa-solid fa-trash-can"></i>
+                            <button mat-icon-button (click)="deleteTransaction(t.id)" title="Excluir" color="warn">
+                                <mat-icon>delete</mat-icon>
                             </button>
                         </div>
                     </td>
@@ -75,32 +83,36 @@
                 <!-- Edit Mode -->
                 <tr *ngIf="editingTransactionId() === t.id" class="edit-row">
                     <td data-label="Data">
-                        <input type="date" [(ngModel)]="editData.date">
+                        <mat-form-field appearance="outline" class="edit-date-field">
+                            <input matInput [matDatepicker]="editPicker" [(ngModel)]="editData.date">
+                            <mat-datepicker-toggle matIconSuffix [for]="editPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #editPicker></mat-datepicker>
+                        </mat-form-field>
                     </td>
                     <td data-label="Descrição">
-                        <input type="text" [(ngModel)]="editData.description">
+                        <input type="text" [(ngModel)]="editData.description" class="edit-input">
                     </td>
                     <td data-label="Categoria">
-                        <select [(ngModel)]="editData.categoryId">
+                        <select [(ngModel)]="editData.categoryId" class="edit-input">
                             <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
                         </select>
                     </td>
                     <td data-label="Tipo">
-                        <select [(ngModel)]="editData.type">
+                        <select [(ngModel)]="editData.type" class="edit-input">
                             <option value="INCOME">Receita</option>
                             <option value="EXPENSE">Despesa</option>
                         </select>
                     </td>
                     <td data-label="Valor">
-                        <input type="number" [(ngModel)]="editData.amount" step="0.01">
+                        <input type="number" [(ngModel)]="editData.amount" step="0.01" class="edit-input">
                     </td>
                     <td data-label="Ações">
                         <div class="actions">
-                            <button class="btn-sm btn-success" (click)="saveEdit()" title="Salvar">
-                                <i class="fa-solid fa-check"></i>
+                            <button mat-icon-button (click)="saveEdit()" title="Salvar" color="primary">
+                                <mat-icon>check</mat-icon>
                             </button>
-                            <button class="btn-sm btn-secondary" (click)="cancelEdit()" title="Cancelar">
-                                <i class="fa-solid fa-xmark"></i>
+                            <button mat-icon-button (click)="cancelEdit()" title="Cancelar">
+                                <mat-icon>close</mat-icon>
                             </button>
                         </div>
                     </td>
@@ -109,30 +121,10 @@
         </tbody>
     </table>
 
-    <div class="pagination-footer" *ngIf="transactions().length > 0">
-        <div class="pagination-info">
-            Mostrando {{ transactions().length }} de {{ totalElements() }} resultados
-        </div>
-        <div class="pagination-controls">
-            <button class="btn-page" [disabled]="currentPage() === 0" (click)="onPageChange(currentPage() - 1)">
-                <i class="fa-solid fa-chevron-left"></i> Anterior
-            </button>
-            <span class="page-indicator">Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
-            <button class="btn-page" [disabled]="currentPage() >= totalPages() - 1"
-                (click)="onPageChange(currentPage() + 1)">
-                Próximo <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
-        <div class="page-size-selector">
-            <label>Itens por página:</label>
-            <select [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
-                <option [value]="5">5</option>
-                <option [value]="10">10</option>
-                <option [value]="20">20</option>
-                <option [value]="50">50</option>
-            </select>
-        </div>
-    </div>
-
     <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
+
+    <mat-paginator *ngIf="transactions().length > 0" [length]="totalElements()" [pageSize]="pageSize()"
+        [pageIndex]="currentPage()" [pageSizeOptions]="[5, 10, 20, 50]" (page)="onMatPageChange($event)"
+        showFirstLastButtons>
+    </mat-paginator>
 </div>

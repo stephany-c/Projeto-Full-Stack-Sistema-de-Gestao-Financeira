@@ -1,89 +1,89 @@
-<div class="transaction-form-container">
-    <h2>Nova Transação</h2>
+<div class="form-container">
+    <h2>{{ isEditing() ? 'Editar Transação' : 'Nova Transação' }}</h2>
 
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label>Descrição</label>
-            <input type="text" formControlName="description" placeholder="Ex: Salário, Aluguel..."
-                [class.invalid]="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
-            <small class="error-msg"
-                *ngIf="transactionForm.get('description')?.hasError('required') && transactionForm.get('description')?.touched">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrição</mat-label>
+            <input matInput formControlName="description" placeholder="Ex: Salário, Aluguel...">
+            <mat-error *ngIf="transactionForm.get('description')?.hasError('required')">
                 A descrição é obrigatória.
-            </small>
-            <small class="error-msg"
-                *ngIf="transactionForm.get('description')?.hasError('minlength') && transactionForm.get('description')?.touched">
+            </mat-error>
+            <mat-error *ngIf="transactionForm.get('description')?.hasError('minlength')">
                 Mínimo de 3 caracteres.
-            </small>
-        </div>
+            </mat-error>
+        </mat-form-field>
 
         <div class="form-row">
-            <div class="form-group">
-                <label>Valor (R$)</label>
-                <input type="text" [value]="formattedAmount()" (input)="onAmountInput($event)" (blur)="onAmountBlur()"
-                    placeholder="R$ 0,00"
-                    [class.invalid]="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
-                <small class="error-msg"
-                    *ngIf="transactionForm.get('amount')?.hasError('required') && transactionForm.get('amount')?.touched">
+            <mat-form-field appearance="outline">
+                <mat-label>Valor (R$)</mat-label>
+                <input matInput [value]="formattedAmount()" (input)="onAmountInput($event)" (blur)="onAmountBlur()"
+                    placeholder="R$ 0,00">
+                <mat-error *ngIf="transactionForm.get('amount')?.hasError('required')">
                     O valor é obrigatório.
-                </small>
-                <small class="error-msg"
-                    *ngIf="transactionForm.get('amount')?.hasError('min') && transactionForm.get('amount')?.touched">
+                </mat-error>
+                <mat-error *ngIf="transactionForm.get('amount')?.hasError('min')">
                     O valor deve ser maior que 0.
-                </small>
-            </div>
-            <div class="form-group">
-                <label>Data</label>
-                <input type="date" formControlName="date"
-                    [class.invalid]="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
-                <small class="error-msg"
-                    *ngIf="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Data</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="date">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="transactionForm.get('date')?.invalid">
                     A data é obrigatória.
-                </small>
-            </div>
+                </mat-error>
+            </mat-form-field>
         </div>
 
         <div class="form-row">
-            <div class="form-group">
-                <label>Tipo</label>
-                <select formControlName="type">
-                    <option value="INCOME">Receita</option>
-                    <option value="EXPENSE">Despesa</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Categoria</label>
-                <div class="category-select-wrapper">
-                    <select formControlName="categoryId" [class.error-field]="!hasCategories()">
-                        <option value="" disabled selected>
-                            {{ loading() ? 'Carregando categorias...' : (categories().length === 0 ? 'Nenhuma categoria
-                            encontrada' : 'Selecione uma categoria') }}
-                        </option>
-                        <option *ngFor="let cat of categories()" [value]="cat.id">
+            <mat-form-field appearance="outline">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="type">
+                    <mat-option value="INCOME">Receita</mat-option>
+                    <mat-option value="EXPENSE">Despesa</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div class="category-field">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Categoria</mat-label>
+                    <mat-select formControlName="categoryId">
+                        <mat-option *ngFor="let cat of categories()" [value]="cat.id">
                             {{ cat.name }}
-                        </option>
-                    </select>
-                    <button type="button" class="btn-quick-add" (click)="toggleQuickAdd()" title="Nova Categoria">
-                        <i class="fa-solid" [class.fa-plus]="!isAddingCategory()"
-                            [class.fa-xmark]="isAddingCategory()"></i>
-                    </button>
-                </div>
-
-                <div class="quick-add-container" *ngIf="isAddingCategory()">
-                    <input type="text" [(ngModel)]="newCategoryName" [ngModelOptions]="{standalone: true}"
-                        placeholder="Nome da categoria..." (keyup.enter)="quickAddCategory()">
-                    <button type="button" (click)="quickAddCategory()" [disabled]="!newCategoryName.trim()"
-                        class="btn-save-quick">Salvar</button>
-                </div>
-
-                <div class="no-categories-warning" *ngIf="!loading() && !hasCategories() && !isAddingCategory()">
-                    <span class="warning-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
-                    Você ainda não tem categorias.
-                    <a (click)="toggleQuickAdd()" class="create-link">Criar Agora</a>
-                </div>
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint *ngIf="loading()">Carregando categorias...</mat-hint>
+                    <mat-error *ngIf="!hasCategories() && !loading()">
+                        Nenhuma categoria encontrada.
+                    </mat-error>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="toggleQuickAdd()"
+                    [title]="isAddingCategory() ? 'Cancelar' : 'Nova Categoria'" class="btn-add-cat">
+                    <mat-icon>{{ isAddingCategory() ? 'close' : 'add' }}</mat-icon>
+                </button>
             </div>
         </div>
 
-        <button type="submit" [disabled]="transactionForm.invalid" class="btn-submit">
+        <div *ngIf="!loading() && !hasCategories() && !isAddingCategory()" class="no-cat-warning">
+            <mat-icon color="warn">warning</mat-icon>
+            Você ainda não tem categorias.
+            <a (click)="toggleQuickAdd()" class="link">Criar Agora</a>
+        </div>
+
+        <div *ngIf="isAddingCategory()" class="quick-add">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nova categoria</mat-label>
+                <input matInput [(ngModel)]="newCategoryName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Nome da categoria..." (keyup.enter)="quickAddCategory()">
+            </mat-form-field>
+            <button mat-flat-button color="primary" type="button" (click)="quickAddCategory()"
+                [disabled]="!newCategoryName.trim()">Salvar</button>
+        </div>
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="transactionForm.invalid" class="btn-submit">
+            <mat-icon>save</mat-icon>
             Salvar Transação
         </button>
     </form>

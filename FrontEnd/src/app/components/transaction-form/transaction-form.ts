@@ -6,11 +6,21 @@ import { CategoryService, Category } from '../../services/category.service';
 import { TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-transaction-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [
+        CommonModule, ReactiveFormsModule, FormsModule,
+        MatFormFieldModule, MatInputModule, MatSelectModule,
+        MatButtonModule, MatIconModule, MatDatepickerModule
+    ],
     templateUrl: './transaction-form.html',
     styleUrl: './transaction-form.scss'
 })

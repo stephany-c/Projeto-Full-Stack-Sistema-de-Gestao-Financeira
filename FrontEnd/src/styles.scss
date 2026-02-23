@@ -1,13 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Define a custom palette using the Green color
+$my-primary: mat.m2-define-palette(mat.$m2-green-palette, 600);
+$my-accent: mat.m2-define-palette(mat.$m2-teal-palette, A200);
+$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+// Create the theme object
+$my-theme: mat.m2-define-light-theme((color: (primary: $my-primary,
+                accent: $my-accent,
+                warn: $my-warn,
+            ),
+            typography: mat.m2-define-typography-config(),
+            density: 0,
+        ));
+
+// Apply the theme to all Angular Material components
+@include mat.all-component-themes($my-theme);
 
 :root {
-    --brand-primary: #10b981;
-    --brand-primary-hover: #059669;
+    --brand-primary: #02d68f;
+    --brand-primary-hover: #0e92685f;
     --brand-secondary: #3b82f6;
     --brand-gradient: linear-gradient(135deg, #10b981, #059669);
-    --brand-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
-    --brand-shadow-hover: 0 20px 25px -5px rgba(16, 185, 129, 0.4);
+    --brand-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.111);
+    --brand-shadow-hover: 0 20px 25px -5px rgba(15, 94, 68, 0.932);
 }
 
 html,

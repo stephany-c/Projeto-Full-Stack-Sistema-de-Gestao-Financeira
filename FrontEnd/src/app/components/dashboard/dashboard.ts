@@ -4,11 +4,13 @@ import { TransactionService } from '../../services/transaction.service';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, BaseChartDirective, MatCardModule, MatIconModule],
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.scss'
 })

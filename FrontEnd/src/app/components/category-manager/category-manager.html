@@ -2,59 +2,77 @@
     <h2>Gerenciar Categorias</h2>
 
     <div class="add-category-form">
-        <input type="text" [(ngModel)]="newCategoryName" placeholder="Nome da categoria" class="form-input">
-        <button (click)="addCategory()" class="btn-primary">Adicionar</button>
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nova categoria</mat-label>
+            <mat-icon matPrefix>label</mat-icon>
+            <input matInput [(ngModel)]="newCategoryName" placeholder="Nome da categoria" (keyup.enter)="addCategory()">
+        </mat-form-field>
+        <button mat-flat-button color="primary" (click)="addCategory()" [disabled]="!newCategoryName.trim()">
+            <mat-icon>add</mat-icon> Adicionar
+        </button>
     </div>
 
-    <div *ngIf="errorMessage()" class="error-message">
+    <mat-error *ngIf="errorMessage()">
         <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage() }}
-    </div>
+    </mat-error>
 
-    <div class="search-bar">
-        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-            placeholder="Buscar categoria..." class="form-input search">
-    </div>
+    <mat-form-field appearance="outline" class="full-width search-field">
+        <mat-label>Buscar categoria</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+            placeholder="Buscar categoria...">
+    </mat-form-field>
 
-    <div class="category-list">
-        <div *ngFor="let category of filteredCategories()" class="category-item"
-            [class.editing]="editingId() === category.id" [class.deleting]="deletingId() === category.id">
+    <mat-list class="category-list">
+        <mat-list-item *ngFor="let category of filteredCategories()" [class.deleting]="deletingId() === category.id"
+            [class.editing]="editingId() === category.id">
+            <div class="list-item-wrapper">
+                <!-- Edit Mode -->
+                <div *ngIf="editingId() === category.id; else otherModes" class="item-edit-mode full-width">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <input matInput [(ngModel)]="editName" (keyup.enter)="saveEdit(category.id)">
+                    </mat-form-field>
+                    <button mat-icon-button color="primary" (click)="saveEdit(category.id)" title="Salvar">
+                        <mat-icon>check</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="cancelEdit()" title="Cancelar">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
 
-            <div *ngIf="editingId() === category.id; else otherModes" class="edit-mode">
-                <input [(ngModel)]="editName" class="form-input">
-                <button (click)="saveEdit(category.id)" class="btn-sm btn-success">Salvar</button>
-                <button (click)="cancelEdit()" class="btn-sm btn-secondary">Cancelar</button>
+                <ng-template #otherModes>
+                    <!-- Delete + Reassign Mode -->
+                    <div *ngIf="deletingId() === category.id; else displayMode" class="item-delete-mode full-width">
+                        <span class="reassign-label">Mover transações para:</span>
+                        <mat-form-field appearance="outline" class="reassign-field">
+                            <mat-label>Categoria</mat-label>
+                            <mat-select [(ngModel)]="transferToId">
+                                <mat-option [value]="null">Nenhuma (apagar)</mat-option>
+                                <mat-option *ngFor="let other of getOtherCategories(category.id)" [value]="other.id">
+                                    {{ other.name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <button mat-flat-button color="warn" (click)="confirmDelete(category.id)">
+                            <mat-icon>delete_forever</mat-icon> Confirmar
+                        </button>
+                        <button mat-stroked-button (click)="cancelDelete()">Cancelar</button>
+                    </div>
+                </ng-template>
+
+                <!-- Display Mode -->
+                <ng-template #displayMode>
+                    <span class="category-name">{{ category.name }}</span>
+                    <div class="actions">
+                        <button mat-icon-button color="primary" (click)="startEdit(category)" title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="startDelete(category.id)" title="Excluir">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </ng-template>
             </div>
-
-            <ng-template #otherModes>
-                <div *ngIf="deletingId() === category.id; else displayMode" class="delete-reassign-mode">
-                    <div class="reassign-prompt">
-                        Mover transações para:
-                        <select [(ngModel)]="transferToId" class="form-input sm">
-                            <option [value]="null">Nenhuma (apagar)</option>
-                            <option *ngFor="let other of getOtherCategories(category.id)" [value]="other.id">
-                                {{ other.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="reassign-actions">
-                        <button (click)="confirmDelete(category.id)" class="btn-sm btn-danger">Confirmar
-                            Exclusão</button>
-                        <button (click)="cancelDelete()" class="btn-sm btn-secondary">Cancelar</button>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #displayMode>
-                <span class="category-name">{{ category.name }}</span>
-                <div class="actions">
-                    <button (click)="startEdit(category)" class="btn-icon" title="Editar">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button (click)="startDelete(category.id)" class="btn-icon delete" title="Excluir">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            </ng-template>
-        </div>
-    </div>
+        </mat-list-item>
+    </mat-list>
 </div>

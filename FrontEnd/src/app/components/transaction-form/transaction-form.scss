@@ -1,4 +1,4 @@
-.transaction-form-container {
+.form-container {
     background: white;
     padding: 2.5rem;
     border-radius: 20px;
@@ -15,164 +15,77 @@
     }
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.category-field {
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
 
-    label {
-        font-weight: 600;
-        color: #34495e;
-        font-size: 0.9rem;
+    mat-form-field {
+        flex: 1;
     }
 
-    input,
-    select {
-        padding: 0.75rem 1rem;
-        border: 2px solid #edeff2;
-        border-radius: 10px;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-
-        &:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        &::placeholder {
-            color: #bdc3c7;
-        }
-
-        &.invalid {
-            border-color: #e74c3c;
-            background-color: #fdf2f2;
-        }
-    }
-
-    .error-msg {
-        color: #e74c3c;
-        font-size: 0.8rem;
-        margin-top: -0.2rem;
-        font-weight: 500;
-        animation: fadeIn 0.3s ease;
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .error-field {
-        border-color: #e74c3c !important;
-    }
-
-    .no-categories-warning {
-        font-size: 0.85rem;
-        color: #e67e22;
-        background: #fff5eb;
-        padding: 0.75rem;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-left: 4px solid #e67e22;
-
-        .warning-icon {
-            font-size: 1.1rem;
-        }
-
-        .create-link {
-            color: #3498db;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-
-            &:hover {
-                text-decoration: underline;
-                color: #2980b9;
-            }
-        }
-    }
-
-    .category-select-wrapper {
-        display: flex;
-        gap: 0.5rem;
-
-        select {
-            flex: 1;
-        }
-
-        .btn-quick-add {
-            padding: 0 1rem;
-            background: #f8f9fa;
-            border: 2px solid #edeff2;
-            border-radius: 10px;
-            color: #3498db;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-
-            &:hover {
-                background: #e9ecef;
-                border-color: #3498db;
-            }
-        }
-    }
-
-    .quick-add-container {
-        display: flex;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        background: #f0f7ff;
-        border-radius: 12px;
-        border: 1px dashed #3498db;
+    .btn-add-cat {
         margin-top: 0.5rem;
-        animation: slideDown 0.3s ease;
+    }
+}
 
-        input {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.9rem;
-            border: 1px solid #d1d9e6;
-            border-radius: 8px;
+.quick-add {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f0f7ff;
+    border-radius: 12px;
+    border: 1px dashed #3498db;
+    margin-bottom: 1rem;
+    animation: slideDown 0.3s ease;
 
-            &:focus {
-                border-color: #3498db;
-                outline: none;
-                box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
-            }
-        }
+    button {
+        margin-top: 0.5rem;
+    }
+}
 
-        .btn-save-quick {
-            padding: 0.5rem 1rem;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
+.no-cat-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #e67e22;
+    background: #fff5eb;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border-left: 4px solid #e67e22;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
 
-            &:disabled {
-                background: #bdc3c7;
-                cursor: not-allowed;
-            }
+    .link {
+        color: #3498db;
+        font-weight: 600;
+        cursor: pointer;
 
-            &:hover:not(:disabled) {
-                background: #2980b9;
-            }
+        &:hover {
+            text-decoration: underline;
         }
     }
+}
+
+.btn-submit {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    gap: 0.5rem;
 }
 
 @keyframes slideDown {
@@ -187,43 +100,8 @@
     }
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.btn-submit {
-    width: 100%;
-    padding: 1rem;
-    margin-top: 1rem;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-
-    &:hover:not(:disabled) {
-        background: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-    }
-
-    &:active:not(:disabled) {
-        transform: translateY(0);
-    }
-
-    &:disabled {
-        background: #bdc3c7;
-        cursor: not-allowed;
-    }
-}
-
 @media (max-width: 768px) {
-    .transaction-form-container {
+    .form-container {
         padding: 1.5rem;
         border-radius: 0;
         box-shadow: none;
@@ -231,29 +109,9 @@
 
     .form-row {
         grid-template-columns: 1fr;
-        gap: 1rem;
     }
 
-    .form-group {
-        .category-select-wrapper {
-            flex-direction: column;
-
-            .btn-quick-add {
-                padding: 0.8rem;
-                font-size: 1rem;
-            }
-        }
-
-        .quick-add-container {
-            flex-direction: column;
-
-            .btn-save-quick {
-                width: 100%;
-            }
-        }
-    }
-
-    .btn-submit {
-        padding: 1.25rem;
+    .quick-add {
+        flex-direction: column;
     }
 }
