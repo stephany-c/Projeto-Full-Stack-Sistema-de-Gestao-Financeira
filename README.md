@@ -11,6 +11,9 @@ O **FinançaX** é uma solução Full Stack moderna e robusta para controle de f
 
 ---
 
+## Link do projeto em produção 
+https://projeto-full-stack-sistema-de-gesta-seven.vercel.app/ 
+
 ## 🛠️ Tecnologias Utilizadas
 
 Este projeto é dividido em duas partes principais: um frontend construído com **Angular 19** e um backend com **Spring Boot 3.4**.
