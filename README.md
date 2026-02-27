@@ -118,9 +118,4 @@ Acesse: **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-
 
 ---
 
-## 📄 Licença
-
-Este projeto está sob a licença [MIT](LICENSE).
-
----
-*Desenvolvido por Stephany C.*
+*Desenvolvido por Stephany Carolina.*
