@@ -102,12 +102,13 @@ p {
     margin-bottom: 0.5rem;
 }
 
-mat-error {
+.auth-error-container {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
+    color: #f44336;
 }
 
 @media (max-width: 480px) {

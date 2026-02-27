@@ -1,6 +1,11 @@
 <div class="form-container">
     <h2>{{ isEditing() ? 'Editar Transação' : 'Nova Transação' }}</h2>
 
+    <div class="success-alert" *ngIf="successMessage()">
+        <mat-icon>check_circle</mat-icon>
+        {{ successMessage() }}
+    </div>
+
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
             <mat-label>Descrição</mat-label>
@@ -16,8 +21,8 @@
         <div class="form-row">
             <mat-form-field appearance="outline">
                 <mat-label>Valor (R$)</mat-label>
-                <input matInput [value]="formattedAmount()" (input)="onAmountInput($event)" (blur)="onAmountBlur()"
-                    placeholder="R$ 0,00">
+                <input matInput formControlName="amount" [value]="formattedAmount()" (input)="onAmountInput($event)"
+                    (blur)="onAmountBlur()" placeholder="R$ 0,00">
                 <mat-error *ngIf="transactionForm.get('amount')?.hasError('required')">
                     O valor é obrigatório.
                 </mat-error>

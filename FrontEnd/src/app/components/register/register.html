@@ -12,25 +12,38 @@
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Nome Completo</mat-label>
                 <mat-icon matPrefix>person</mat-icon>
-                <input matInput type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome">
+                <input matInput type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome"
+                    #name="ngModel">
+                <mat-error *ngIf="name.invalid && (name.dirty || name.touched)">
+                    O nome é obrigatório.
+                </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>E-mail</mat-label>
                 <mat-icon matPrefix>email</mat-icon>
                 <input matInput type="email" [(ngModel)]="user.email" name="email" required email
-                    placeholder="seu@email.com">
+                    placeholder="seu@email.com" #regEmail="ngModel">
+                <mat-error *ngIf="regEmail.invalid && (regEmail.dirty || regEmail.touched)">
+                    <span *ngIf="regEmail.errors?.['required']">O e-mail é obrigatório.</span>
+                    <span *ngIf="regEmail.errors?.['email']">Digite um e-mail válido.</span>
+                </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Senha</mat-label>
                 <mat-icon matPrefix>lock</mat-icon>
                 <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" name="password"
-                    required placeholder="Sua senha" (focus)="passwordFocused = true" (blur)="passwordFocused = false">
+                    required minlength="6" placeholder="Sua senha" (focus)="passwordFocused = true"
+                    (blur)="passwordFocused = false" #regPassword="ngModel">
                 <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
                     *ngIf="passwordFocused">
                     <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
+                <mat-error *ngIf="regPassword.invalid && (regPassword.dirty || regPassword.touched)">
+                    <span *ngIf="regPassword.errors?.['required']">A senha é obrigatória.</span>
+                    <span *ngIf="regPassword.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</span>
+                </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
@@ -38,16 +51,20 @@
                 <mat-icon matPrefix>lock_reset</mat-icon>
                 <input matInput [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="user.confirmPassword"
                     name="confirmPassword" required placeholder="Repita sua senha"
-                    (focus)="confirmPasswordFocused = true" (blur)="confirmPasswordFocused = false">
+                    (focus)="confirmPasswordFocused = true" (blur)="confirmPasswordFocused = false"
+                    #confirmPassword="ngModel">
                 <button mat-icon-button matSuffix type="button" (mousedown)="toggleConfirmPassword($event)"
                     *ngIf="confirmPasswordFocused">
                     <mat-icon>{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
+                <mat-error *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)">
+                    Confirme sua senha.
+                </mat-error>
             </mat-form-field>
 
-            <mat-error *ngIf="errorMessage">
+            <div class="auth-error-container" *ngIf="errorMessage">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
-            </mat-error>
+            </div>
 
             <div *ngIf="successMessage" class="success-message">
                 <i class="fa-solid fa-circle-check"></i> {{ successMessage }}

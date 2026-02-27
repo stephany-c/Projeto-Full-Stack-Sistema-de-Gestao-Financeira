@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -32,7 +32,11 @@ export class LoginComponent {
   showPassword = false;
   passwordFocused = false;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   togglePassword(event: Event) {
     event.preventDefault();
@@ -46,8 +50,10 @@ export class LoginComponent {
       },
       error: (err) => {
         this.errorMessage = 'E-mail ou senha incorretos.';
+        this.cdr.detectChanges();
         console.error(err);
       }
     });
   }
 }
+

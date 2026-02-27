@@ -18,22 +18,40 @@
     }
 }
 
+.filter-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #616e83;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+
+    mat-icon {
+        font-size: 1.1rem;
+        width: 1.1rem;
+        height: 1.1rem;
+    }
+}
+
 .filters {
     display: flex;
     gap: 0.75rem;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     margin-bottom: 2rem;
     width: 100%;
 
     mat-form-field {
-        min-width: 100px; // Further reduced
+        min-width: 100px;
         flex: 1;
         margin-bottom: -1.25rem;
     }
 
     .range-field {
-        min-width: 220px; // Slightly smaller
+        min-width: 220px;
         flex: 2;
     }
 
@@ -45,7 +63,7 @@
     button {
         height: 56px;
         white-space: nowrap;
-        padding: 0 1rem; // Compact padding
+        padding: 0 1rem;
     }
 }
 

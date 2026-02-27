@@ -13,7 +13,11 @@
                 <mat-label>E-mail</mat-label>
                 <mat-icon matPrefix>email</mat-icon>
                 <input matInput type="email" [(ngModel)]="credentials.email" name="email" required email
-                    placeholder="seu@email.com">
+                    placeholder="seu@email.com" #email="ngModel">
+                <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
+                    <span *ngIf="email.errors?.['required']">O e-mail é obrigatório.</span>
+                    <span *ngIf="email.errors?.['email']">Digite um e-mail válido.</span>
+                </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
@@ -21,16 +25,19 @@
                 <mat-icon matPrefix>lock</mat-icon>
                 <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password"
                     name="password" required placeholder="Sua senha" (focus)="passwordFocused = true"
-                    (blur)="passwordFocused = false">
+                    (blur)="passwordFocused = false" #password="ngModel">
                 <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
                     *ngIf="passwordFocused">
                     <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
+                <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+                    A senha é obrigatória.
+                </mat-error>
             </mat-form-field>
 
-            <mat-error *ngIf="errorMessage">
+            <div class="login-error" *ngIf="errorMessage">
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
-            </mat-error>
+            </div>
 
             <button mat-flat-button color="primary" type="submit" class="btn-primary"
                 [disabled]="!loginForm.form.valid">

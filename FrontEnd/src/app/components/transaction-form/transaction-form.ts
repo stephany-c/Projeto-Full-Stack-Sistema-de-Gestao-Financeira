@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormGroupDirective } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
+// ... (mantenha os outros imports)
 import { CategoryService, Category } from '../../services/category.service';
 import { TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
@@ -15,6 +16,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-transaction-form',
+    // ... (mantenha o restante)
     standalone: true,
     imports: [
         CommonModule, ReactiveFormsModule, FormsModule,
@@ -25,7 +27,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     styleUrl: './transaction-form.scss'
 })
 export class TransactionFormComponent implements OnInit {
+    @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
     @Output() transactionCreated = new EventEmitter<void>();
+    // ... (mantenha as outras propriedades)
     transactionForm: FormGroup;
     transactionTypes = Object.values(TransactionType);
     categories = signal<Category[]>([]);
@@ -33,6 +37,7 @@ export class TransactionFormComponent implements OnInit {
     hasCategories = signal<boolean>(true);
     isEditing = signal<boolean>(false);
     transactionId: number | null = null;
+    successMessage = signal<string | null>(null);
 
     isAddingCategory = signal<boolean>(false);
     newCategoryName = '';
@@ -58,7 +63,6 @@ export class TransactionFormComponent implements OnInit {
     ngOnInit(): void {
         const userId = this.authService.getUserId();
         if (userId) {
-            console.log('🔍 TransactionForm - ngOnInit - userId:', userId);
             this.transactionForm.patchValue({ userId });
             this.loadCategories(userId);
         }
@@ -73,6 +77,7 @@ export class TransactionFormComponent implements OnInit {
         });
     }
 
+    // ... (pular loadCategories, loadTransaction, toggleQuickAdd, quickAddCategory)
     loadCategories(userId: number): void {
         console.log('📂 Loading categories for userId:', userId);
         this.loading.set(true);
@@ -157,14 +162,22 @@ export class TransactionFormComponent implements OnInit {
             } else {
                 this.transactionService.create(formValue).subscribe({
                     next: () => {
-                        this.transactionForm.reset({
-                            description: '',
-                            amount: 0,
-                            date: new Date().toISOString().split('T')[0],
-                            type: TransactionType.EXPENSE,
-                            categoryId: this.categories()[0]?.id,
-                            userId
-                        });
+                        this.successMessage.set('Transação cadastrada!');
+                        setTimeout(() => this.successMessage.set(null), 3000);
+
+                        // Reset completo do formulário e do estado visual do Material
+                        if (this.formDirective) {
+                            this.formDirective.resetForm({
+                                description: '',
+                                amount: 0,
+                                date: new Date().toISOString().split('T')[0],
+                                type: TransactionType.EXPENSE,
+                                categoryId: this.categories()[0]?.id,
+                                userId
+                            });
+                        }
+
+                        this.formattedAmount.set('');
                         this.transactionCreated.emit();
                     },
                     error: (err) => {

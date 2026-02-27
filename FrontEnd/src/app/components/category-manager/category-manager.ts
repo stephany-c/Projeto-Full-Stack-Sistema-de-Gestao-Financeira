@@ -39,6 +39,7 @@ export class CategoryManagerComponent implements OnInit {
     transferToId: number | null = null;
 
     errorMessage = signal<string | null>(null);
+    successMessage = signal<string | null>(null);
 
     private categoryService = inject(CategoryService);
 
@@ -56,6 +57,8 @@ export class CategoryManagerComponent implements OnInit {
 
         this.categoryService.create(this.newCategoryName).subscribe({
             next: () => {
+                this.successMessage.set('Categoria criada com sucesso!');
+                setTimeout(() => this.successMessage.set(null), 3000);
                 this.newCategoryName = '';
                 this.loadCategories();
             },
@@ -83,6 +86,8 @@ export class CategoryManagerComponent implements OnInit {
 
         this.categoryService.update(id, this.editName).subscribe({
             next: () => {
+                this.successMessage.set('Categoria atualizada com sucesso!');
+                setTimeout(() => this.successMessage.set(null), 3000);
                 this.cancelEdit();
                 this.loadCategories();
             },
@@ -107,6 +112,8 @@ export class CategoryManagerComponent implements OnInit {
     confirmDelete(id: number) {
         this.categoryService.delete(id, this.transferToId || undefined).subscribe({
             next: () => {
+                this.successMessage.set('Categoria excluída com sucesso!');
+                setTimeout(() => this.successMessage.set(null), 3000);
                 this.cancelDelete();
                 this.loadCategories();
             },

@@ -1,6 +1,11 @@
 <div class="category-manager-container">
     <h2>Gerenciar Categorias</h2>
 
+    <div class="success-alert" *ngIf="successMessage()">
+        <mat-icon>check_circle</mat-icon>
+        {{ successMessage() }}
+    </div>
+
     <div class="add-category-form">
         <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nova categoria</mat-label>

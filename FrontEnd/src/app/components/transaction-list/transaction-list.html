@@ -4,6 +4,10 @@
     </div>
 
     <div class="filters">
+        <div class="filter-header">
+            <mat-icon>filter_list</mat-icon>
+            <span>FILTROS</span>
+        </div>
         <mat-form-field appearance="outline" class="range-field">
             <mat-label>Período</mat-label>
             <mat-date-range-input [rangePicker]="rangePicker">
@@ -42,7 +46,7 @@
         </mat-form-field>
 
         <button mat-stroked-button (click)="clearFilter()">
-            <mat-icon>clear</mat-icon> Limpar
+            <mat-icon>clear</mat-icon> Limpar Filtros
         </button>
     </div>
 
