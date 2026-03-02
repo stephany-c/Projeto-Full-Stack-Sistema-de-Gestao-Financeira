@@ -28,6 +28,12 @@ export class App {
         this.isSidebarOpen.set(false);
       }
     });
+
+    // Ping o backend para mitigar o cold start no Render
+    this.authService.ping().subscribe({
+      next: () => console.log('Backend "pre-warmed" com sucesso'),
+      error: (err) => console.error('Erro ao tentar "pre-warm" o backend:', err)
+    });
   }
 
   @HostListener('window:resize', ['$event'])

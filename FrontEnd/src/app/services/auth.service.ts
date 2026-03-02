@@ -39,6 +39,10 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}/register`, userData);
     }
 
+    ping(): Observable<any> {
+        return this.http.get(`${environment.apiUrl}/public/health`);
+    }
+
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
