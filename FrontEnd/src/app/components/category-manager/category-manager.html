@@ -48,13 +48,20 @@
                 <ng-template #otherModes>
                     <!-- Delete + Reassign Mode -->
                     <div *ngIf="deletingId() === category.id; else displayMode" class="item-delete-mode full-width">
-                        <span class="reassign-label">Mover transações para:</span>
+                        <span class="reassign-label">Mover transações cadastradas nessa categoria para:</span>
                         <mat-form-field appearance="outline" class="reassign-field">
-                            <mat-label>Categoria</mat-label>
-                            <mat-select [(ngModel)]="transferToId">
-                                <mat-option [value]="null">Nenhuma (apagar)</mat-option>
+                            <mat-label>Nova Categoria</mat-label>
+                            <mat-select [ngModel]="transferToId()" (ngModelChange)="transferToId.set($event)"
+                                placeholder="Selecione...">
+                                <mat-select-trigger>
+                                    {{ getCategoryName(transferToId()) }}
+                                </mat-select-trigger>
+                                <mat-option [value]="-1">Nenhuma (Excluir transações)</mat-option>
                                 <mat-option *ngFor="let other of getOtherCategories(category.id)" [value]="other.id">
                                     {{ other.name }}
+                                </mat-option>
+                                <mat-option *ngIf="getOtherCategories(category.id).length === 0" disabled>
+                                    Nenhuma outra categoria disponível
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>

@@ -39,6 +39,10 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}/register`, userData);
     }
 
+    /**
+     * "Acorda" o backend no Render (Cold Start).
+     * Chamado no startup da aplicação para reduzir o delay no primeiro login.
+     */
     ping(): Observable<any> {
         return this.http.get(`${environment.apiUrl}/public/health`);
     }

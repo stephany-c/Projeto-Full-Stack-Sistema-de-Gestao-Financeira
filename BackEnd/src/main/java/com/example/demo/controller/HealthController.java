@@ -11,6 +11,11 @@ import java.util.Map;
 @RequestMapping("/api/public")
 public class HealthController {
 
+    /**
+     * Endpoint público para "despertar" o backend no Render (Cold Start).
+     * O Frontend chama este endpoint no carregamento inicial para reduzir a
+     * latência de login.
+     */
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> healthCheck() {
         return ResponseEntity.ok(Map.of("status", "UP", "message", "Server is running"));

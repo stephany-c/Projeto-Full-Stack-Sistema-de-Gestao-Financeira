@@ -36,7 +36,9 @@ export class CategoryManagerComponent implements OnInit {
     editName = '';
 
     deletingId = signal<number | null>(null);
-    transferToId: number | null = null;
+    // Usamos -1 como ID especial para "Excluir transações" associadas à categoria deletada.
+    // Isso evita problemas visuais do mat-select com o valor 'null'.
+    transferToId = signal<number>(-1);
 
     errorMessage = signal<string | null>(null);
     successMessage = signal<string | null>(null);
@@ -101,16 +103,18 @@ export class CategoryManagerComponent implements OnInit {
 
     startDelete(id: number) {
         this.deletingId.set(id);
-        this.transferToId = null;
+        this.transferToId.set(-1);
     }
 
     cancelDelete() {
         this.deletingId.set(null);
-        this.transferToId = null;
+        this.transferToId.set(-1);
     }
 
     confirmDelete(id: number) {
-        this.categoryService.delete(id, this.transferToId || undefined).subscribe({
+        const transferId = this.transferToId();
+        const finalTransferId = transferId === -1 ? undefined : transferId;
+        this.categoryService.delete(id, finalTransferId).subscribe({
             next: () => {
                 this.successMessage.set('Categoria excluída com sucesso!');
                 setTimeout(() => this.successMessage.set(null), 3000);
@@ -126,5 +130,11 @@ export class CategoryManagerComponent implements OnInit {
 
     getOtherCategories(excludeId: number): Category[] {
         return this.categories().filter(c => c.id !== excludeId);
+    }
+
+    getCategoryName(id: number): string {
+        if (id === -1) return 'Excluir transações';
+        const cat = this.categories().find(c => c.id === id);
+        return cat ? cat.name : 'Excluir transações';
     }
 }
