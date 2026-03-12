@@ -2,18 +2,21 @@
   <div class="header-actions">
     <h2>Dashboard Financeiro <mat-icon class="title-icon">bar_chart</mat-icon></h2>
 
-    <mat-form-field appearance="outline" class="period-select">
-      <mat-label>Período</mat-label>
-      <mat-select [value]="selectedPeriod()" (selectionChange)="onPeriodChange($event.value)">
-        <mat-option value="7days">Últimos 7 dias</mat-option>
-        <mat-option value="30days">Últimos 30 dias</mat-option>
-        <mat-option value="month">Este Mês</mat-option>
-        <mat-option value="90days">Últimos 90 dias</mat-option>
-        <mat-option value="thisYear">Este Ano</mat-option>
-        <mat-option value="lastYear">Ano Passado</mat-option>
-        <mat-option value="all">Tudo</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div class="filters-container">
+      <mat-form-field appearance="outline" class="filter-select">
+        <mat-label>Ano</mat-label>
+        <mat-select [value]="selectedYear()" (selectionChange)="selectedYear.set($event.value); onMonthYearChange()">
+          <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-select">
+        <mat-label>Período</mat-label>
+        <mat-select [value]="selectedMonth()" (selectionChange)="selectedMonth.set($event.value); onMonthYearChange()">
+          <mat-option *ngFor="let month of months" [value]="month.value">{{ month.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
 
   <div class="summary-grid">

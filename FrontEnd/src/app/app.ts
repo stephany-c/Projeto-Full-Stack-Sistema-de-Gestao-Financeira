@@ -11,6 +11,10 @@ import { filter } from 'rxjs';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
+/**
+ * Componente principal da aplicação.
+ * Gerencia o layout global (sidebar), a responsividade e o processo de warm-up do backend.
+ */
 export class App {
   protected readonly title = signal('FinançaX');
   authService = inject(AuthService);

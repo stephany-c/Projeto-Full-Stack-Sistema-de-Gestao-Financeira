@@ -3,12 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-interface LoginResponse {
-    token: string;
-    userId: number;
-    name: string;
-    email: string;
-}
+import { LoginResponse } from '../models/auth.model';
 
 @Injectable({
     providedIn: 'root'

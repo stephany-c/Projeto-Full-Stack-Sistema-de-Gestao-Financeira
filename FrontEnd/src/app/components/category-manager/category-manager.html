@@ -6,13 +6,18 @@
         {{ successMessage() }}
     </div>
 
-    <div class="add-category-form">
+    <div class="add-category-form" [formGroup]="addForm">
         <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nova categoria</mat-label>
             <mat-icon matPrefix>label</mat-icon>
-            <input matInput [(ngModel)]="newCategoryName" placeholder="Nome da categoria" (keyup.enter)="addCategory()">
+            <input matInput formControlName="name" placeholder="Nome da categoria" (keyup.enter)="addCategory()">
+            <mat-error
+                *ngIf="addForm.get('name')?.invalid && (addForm.get('name')?.dirty || addForm.get('name')?.touched)">
+                <span *ngIf="addForm.get('name')?.errors?.['required']">Nome é obrigatório.</span>
+                <span *ngIf="addForm.get('name')?.errors?.['minlength']">Mínimo de 2 caracteres.</span>
+            </mat-error>
         </mat-form-field>
-        <button mat-flat-button color="primary" (click)="addCategory()" [disabled]="!newCategoryName.trim()">
+        <button mat-flat-button color="primary" (click)="addCategory()" [disabled]="addForm.invalid">
             <mat-icon>add</mat-icon> Adicionar
         </button>
     </div>
@@ -35,9 +40,13 @@
                 <!-- Edit Mode -->
                 <div *ngIf="editingId() === category.id; else otherModes" class="item-edit-mode full-width">
                     <mat-form-field appearance="outline" class="full-width">
-                        <input matInput [(ngModel)]="editName" (keyup.enter)="saveEdit(category.id)">
+                        <input matInput [formControl]="editControl" (keyup.enter)="saveEdit(category.id)">
+                        <mat-error *ngIf="editControl.invalid && (editControl.dirty || editControl.touched)">
+                            Inválido.
+                        </mat-error>
                     </mat-form-field>
-                    <button mat-icon-button color="primary" (click)="saveEdit(category.id)" title="Salvar">
+                    <button mat-icon-button color="primary" (click)="saveEdit(category.id)"
+                        [disabled]="editControl.invalid" title="Salvar">
                         <mat-icon>check</mat-icon>
                     </button>
                     <button mat-icon-button (click)="cancelEdit()" title="Cancelar">

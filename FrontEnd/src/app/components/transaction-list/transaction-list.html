@@ -1,6 +1,11 @@
 <div class="transaction-list-container">
     <div class="header-actions">
         <h2>Transações</h2>
+        <div class="main-actions">
+            <button mat-flat-button color="accent" (click)="exportToExcel()" *ngIf="selectedIds().size === 0">
+                <mat-icon>file_download</mat-icon> Exportar Excel
+            </button>
+        </div>
     </div>
 
     <div class="filters">
@@ -46,13 +51,31 @@
         </mat-form-field>
 
         <button mat-stroked-button (click)="clearFilter()">
-            <mat-icon>clear</mat-icon> Limpar Filtros
+            <mat-icon>close</mat-icon> Limpar Filtros
         </button>
+    </div>
+
+    <div class="bulk-actions-container" *ngIf="selectedIds().size > 0">
+        <div class="bulk-actions">
+            <span class="selection-count">{{ selectedIds().size }} selecionados</span>
+            <button mat-flat-button color="warn" (click)="deleteSelected()">
+                <mat-icon>delete_sweep</mat-icon> Excluir Selecionados
+            </button>
+        </div>
+    </div>
+
+    <div class="mobile-select-all" *ngIf="transactions().length > 0">
+        <mat-checkbox [checked]="isAllSelected()" (change)="toggleAll()">
+            Selecionar todos os itens da página
+        </mat-checkbox>
     </div>
 
     <table class="transaction-table">
         <thead>
             <tr>
+                <th class="col-check">
+                    <mat-checkbox [checked]="isAllSelected()" (change)="toggleAll()"></mat-checkbox>
+                </th>
                 <th>Data</th>
                 <th>Descrição</th>
                 <th>Categoria</th>
@@ -65,19 +88,24 @@
             <ng-container *ngFor="let t of transactions()">
                 <!-- View Mode -->
                 <tr *ngIf="editingTransactionId() !== t.id" [ngClass]="t.type.toLowerCase()">
+                    <td class="col-check">
+                        <mat-checkbox [checked]="selectedIds().has(t.id!)"
+                            (change)="toggleSelection(t.id)"></mat-checkbox>
+                    </td>
                     <td data-label="Data">{{ t.date | date:'dd/MM/yyyy' }}</td>
                     <td data-label="Descrição">{{ t.description }}</td>
                     <td data-label="Categoria">
                         <span class="category-badge">{{ t.categoryName }}</span>
                     </td>
                     <td data-label="Tipo">{{ t.type === 'INCOME' ? 'Receita' : 'Despesa' }}</td>
-                    <td data-label="Valor">{{ t.amount | currency:'BRL' }}</td>
+                    <td data-label="Valor" class="amount-cell">{{ t.amount | currency:'BRL' }}</td>
                     <td data-label="Ações">
                         <div class="actions">
-                            <button mat-icon-button (click)="startEdit(t)" title="Editar" color="primary">
+                            <button mat-icon-button (click)="startEdit(t)" title="Editar" class="edit-btn">
                                 <mat-icon>edit</mat-icon>
                             </button>
-                            <button mat-icon-button (click)="deleteTransaction(t.id)" title="Excluir" color="warn">
+                            <button mat-icon-button (click)="deleteTransaction(t.id)" title="Excluir"
+                                class="delete-btn">
                                 <mat-icon>delete</mat-icon>
                             </button>
                         </div>
@@ -86,29 +114,39 @@
 
                 <!-- Edit Mode -->
                 <tr *ngIf="editingTransactionId() === t.id" class="edit-row">
+                    <td></td> <!-- Empty for selection column during edit -->
                     <td data-label="Data">
-                        <mat-form-field appearance="outline" class="edit-date-field">
+                        <mat-form-field appearance="outline" class="edit-field">
                             <input matInput [matDatepicker]="editPicker" [(ngModel)]="editData.date">
                             <mat-datepicker-toggle matIconSuffix [for]="editPicker"></mat-datepicker-toggle>
                             <mat-datepicker #editPicker></mat-datepicker>
                         </mat-form-field>
                     </td>
                     <td data-label="Descrição">
-                        <input type="text" [(ngModel)]="editData.description" class="edit-input">
+                        <mat-form-field appearance="outline" class="edit-field">
+                            <input matInput [(ngModel)]="editData.description">
+                        </mat-form-field>
                     </td>
                     <td data-label="Categoria">
-                        <select [(ngModel)]="editData.categoryId" class="edit-input">
-                            <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
-                        </select>
+                        <mat-form-field appearance="outline" class="edit-field">
+                            <mat-select [(ngModel)]="editData.categoryId">
+                                <mat-option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
                     </td>
                     <td data-label="Tipo">
-                        <select [(ngModel)]="editData.type" class="edit-input">
-                            <option value="INCOME">Receita</option>
-                            <option value="EXPENSE">Despesa</option>
-                        </select>
+                        <mat-form-field appearance="outline" class="edit-field">
+                            <mat-select [(ngModel)]="editData.type">
+                                <mat-option value="INCOME">Receita</mat-option>
+                                <mat-option value="EXPENSE">Despesa</mat-option>
+                            </mat-select>
+                        </mat-form-field>
                     </td>
                     <td data-label="Valor">
-                        <input type="number" [(ngModel)]="editData.amount" step="0.01" class="edit-input">
+                        <mat-form-field appearance="outline" class="edit-field">
+                            <input matInput type="number" [(ngModel)]="editData.amount" step="0.01">
+                        </mat-form-field>
                     </td>
                     <td data-label="Ações">
                         <div class="actions">

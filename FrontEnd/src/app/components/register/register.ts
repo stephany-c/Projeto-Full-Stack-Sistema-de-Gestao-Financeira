@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
 import { MatCardModule } from '@angular/material/card';
@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     RouterModule,
     MatCardModule,
     MatFormFieldModule,
@@ -27,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './register.scss'
 })
 export class RegisterComponent {
-  user = { name: '', email: '', password: '', confirmPassword: '' };
+  registerForm: FormGroup;
   errorMessage = '';
   successMessage = '';
   showPassword = false;
@@ -36,11 +36,30 @@ export class RegisterComponent {
   confirmPasswordFocused = false;
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
-  ) { }
+  ) {
+    this.registerForm = this.fb.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
+
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
 
   togglePassword(event: Event) {
     event.preventDefault(); // Prevent blur from firing
@@ -56,12 +75,9 @@ export class RegisterComponent {
     this.errorMessage = ''; // Clear previous errors
     this.successMessage = '';
 
-    if (this.user.password !== this.user.confirmPassword) {
-      this.errorMessage = 'As senhas não coincidem.';
-      return;
-    }
+    if (this.registerForm.invalid) return;
 
-    this.authService.register(this.user).subscribe({
+    this.authService.register(this.registerForm.value).subscribe({
       next: () => {
         this.ngZone.run(() => {
           this.successMessage = 'Conta criada com sucesso! Redirecionando...';

@@ -8,13 +8,13 @@
         <h1>Crie sua conta</h1>
         <p>Junte-se a nós e comece a organizar sua vida financeira.</p>
 
-        <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="auth-form">
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Nome Completo</mat-label>
                 <mat-icon matPrefix>person</mat-icon>
-                <input matInput type="text" [(ngModel)]="user.name" name="name" required placeholder="Seu nome"
-                    #name="ngModel">
-                <mat-error *ngIf="name.invalid && (name.dirty || name.touched)">
+                <input matInput type="text" formControlName="name" placeholder="Seu nome">
+                <mat-error
+                    *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)">
                     O nome é obrigatório.
                 </mat-error>
             </mat-form-field>
@@ -22,43 +22,46 @@
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>E-mail</mat-label>
                 <mat-icon matPrefix>email</mat-icon>
-                <input matInput type="email" [(ngModel)]="user.email" name="email" required email
-                    placeholder="seu@email.com" #regEmail="ngModel">
-                <mat-error *ngIf="regEmail.invalid && (regEmail.dirty || regEmail.touched)">
-                    <span *ngIf="regEmail.errors?.['required']">O e-mail é obrigatório.</span>
-                    <span *ngIf="regEmail.errors?.['email']">Digite um e-mail válido.</span>
+                <input matInput type="email" formControlName="email" placeholder="seu@email.com">
+                <mat-error
+                    *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)">
+                    <span *ngIf="registerForm.get('email')?.errors?.['required']">O e-mail é obrigatório.</span>
+                    <span *ngIf="registerForm.get('email')?.errors?.['email']">Digite um e-mail válido.</span>
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Senha</mat-label>
                 <mat-icon matPrefix>lock</mat-icon>
-                <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" name="password"
-                    required minlength="6" placeholder="Sua senha" (focus)="passwordFocused = true"
-                    (blur)="passwordFocused = false" #regPassword="ngModel">
+                <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                    placeholder="Sua senha" (focus)="passwordFocused = true" (blur)="passwordFocused = false">
                 <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
                     *ngIf="passwordFocused">
                     <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
-                <mat-error *ngIf="regPassword.invalid && (regPassword.dirty || regPassword.touched)">
-                    <span *ngIf="regPassword.errors?.['required']">A senha é obrigatória.</span>
-                    <span *ngIf="regPassword.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</span>
+                <mat-error
+                    *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)">
+                    <span *ngIf="registerForm.get('password')?.errors?.['required']">A senha é obrigatória.</span>
+                    <span *ngIf="registerForm.get('password')?.errors?.['minlength']">A senha deve ter pelo menos 6
+                        caracteres.</span>
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Confirmar Senha</mat-label>
                 <mat-icon matPrefix>lock_reset</mat-icon>
-                <input matInput [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="user.confirmPassword"
-                    name="confirmPassword" required placeholder="Repita sua senha"
-                    (focus)="confirmPasswordFocused = true" (blur)="confirmPasswordFocused = false"
-                    #confirmPassword="ngModel">
+                <input matInput [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword"
+                    placeholder="Repita sua senha" (focus)="confirmPasswordFocused = true"
+                    (blur)="confirmPasswordFocused = false">
                 <button mat-icon-button matSuffix type="button" (mousedown)="toggleConfirmPassword($event)"
                     *ngIf="confirmPasswordFocused">
                     <mat-icon>{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
-                <mat-error *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)">
-                    Confirme sua senha.
+                <mat-error
+                    *ngIf="registerForm.get('confirmPassword')?.invalid && (registerForm.get('confirmPassword')?.dirty || registerForm.get('confirmPassword')?.touched)">
+                    <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirme sua senha.</span>
+                    <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">As senhas não
+                        coincidem.</span>
                 </mat-error>
             </mat-form-field>
 
@@ -70,8 +73,7 @@
                 <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
             </div>
 
-            <button mat-flat-button color="primary" type="submit" class="btn-primary"
-                [disabled]="!registerForm.form.valid">
+            <button mat-flat-button color="primary" type="submit" class="btn-primary" [disabled]="registerForm.invalid">
                 <span>Criar Conta</span>
                 <mat-icon iconPositionEnd>person_add</mat-icon>
             </button>

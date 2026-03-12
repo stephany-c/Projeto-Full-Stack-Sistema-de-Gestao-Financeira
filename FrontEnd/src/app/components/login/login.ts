@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
 import { MatCardModule } from '@angular/material/card';
@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     RouterModule,
     MatCardModule,
     MatFormFieldModule,
@@ -27,16 +27,22 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
-  credentials = { email: '', password: '' };
+  loginForm: FormGroup;
   errorMessage = '';
   showPassword = false;
   passwordFocused = false;
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
+    });
+  }
 
   togglePassword(event: Event) {
     event.preventDefault();
@@ -44,7 +50,9 @@ export class LoginComponent {
   }
 
   onLogin() {
-    this.authService.login(this.credentials).subscribe({
+    if (this.loginForm.invalid) return;
+
+    this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },

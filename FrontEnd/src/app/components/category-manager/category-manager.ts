@@ -1,7 +1,8 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { CategoryService, Category } from '../../services/category.service';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { CategoryService } from '../../services/category.service';
+import { Category } from '../../models/category.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,7 +14,7 @@ import { MatListModule } from '@angular/material/list';
     selector: 'app-category-manager',
     standalone: true,
     imports: [
-        CommonModule, FormsModule,
+        CommonModule, FormsModule, ReactiveFormsModule,
         MatFormFieldModule, MatInputModule, MatSelectModule,
         MatButtonModule, MatIconModule, MatListModule
     ],
@@ -30,13 +31,11 @@ export class CategoryManagerComponent implements OnInit {
         return this.categories().filter(c => c.name.toLowerCase().includes(term));
     });
 
-    newCategoryName = '';
 
     editingId = signal<number | null>(null);
-    editName = '';
 
     deletingId = signal<number | null>(null);
-    // Usamos -1 como ID especial para "Excluir transações" associadas à categoria deletada.
+    // Usa -1 como ID especial para "Excluir transações" associadas à categoria deletada.
     // Isso evita problemas visuais do mat-select com o valor 'null'.
     transferToId = signal<number>(-1);
 
@@ -44,6 +43,17 @@ export class CategoryManagerComponent implements OnInit {
     successMessage = signal<string | null>(null);
 
     private categoryService = inject(CategoryService);
+    private fb = inject(FormBuilder);
+
+    addForm: FormGroup;
+    editControl: FormControl;
+
+    constructor() {
+        this.addForm = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(2)]]
+        });
+        this.editControl = new FormControl('', [Validators.required, Validators.minLength(2)]);
+    }
 
     ngOnInit() {
         this.loadCategories();
@@ -54,14 +64,16 @@ export class CategoryManagerComponent implements OnInit {
     }
 
     addCategory() {
-        if (!this.newCategoryName.trim()) return;
+        if (this.addForm.invalid) return;
         this.errorMessage.set(null);
 
-        this.categoryService.create(this.newCategoryName).subscribe({
+        const name = this.addForm.get('name')?.value;
+
+        this.categoryService.create(name).subscribe({
             next: () => {
                 this.successMessage.set('Categoria criada com sucesso!');
                 setTimeout(() => this.successMessage.set(null), 3000);
-                this.newCategoryName = '';
+                this.addForm.reset();
                 this.loadCategories();
             },
             error: (err) => {
@@ -74,19 +86,21 @@ export class CategoryManagerComponent implements OnInit {
 
     startEdit(category: Category) {
         this.editingId.set(category.id);
-        this.editName = category.name;
+        this.editControl.setValue(category.name);
     }
 
     cancelEdit() {
         this.editingId.set(null);
-        this.editName = '';
+        this.editControl.setValue('');
     }
 
     saveEdit(id: number) {
-        if (!this.editName.trim()) return;
+        if (this.editControl.invalid) return;
         this.errorMessage.set(null);
 
-        this.categoryService.update(id, this.editName).subscribe({
+        const name = this.editControl.value;
+
+        this.categoryService.update(id, name).subscribe({
             next: () => {
                 this.successMessage.set('Categoria atualizada com sucesso!');
                 setTimeout(() => this.successMessage.set(null), 3000);

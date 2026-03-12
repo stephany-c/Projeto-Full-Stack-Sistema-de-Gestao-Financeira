@@ -8,29 +8,29 @@
         <h1>Bem-vindo!</h1>
         <p>Acesse sua conta para organizar suas finanças.</p>
 
-        <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="auth-form">
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>E-mail</mat-label>
                 <mat-icon matPrefix>email</mat-icon>
-                <input matInput type="email" [(ngModel)]="credentials.email" name="email" required email
-                    placeholder="seu@email.com" #email="ngModel">
-                <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
-                    <span *ngIf="email.errors?.['required']">O e-mail é obrigatório.</span>
-                    <span *ngIf="email.errors?.['email']">Digite um e-mail válido.</span>
+                <input matInput type="email" formControlName="email" placeholder="seu@email.com">
+                <mat-error
+                    *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
+                    <span *ngIf="loginForm.get('email')?.errors?.['required']">O e-mail é obrigatório.</span>
+                    <span *ngIf="loginForm.get('email')?.errors?.['email']">Digite um e-mail válido.</span>
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Senha</mat-label>
                 <mat-icon matPrefix>lock</mat-icon>
-                <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password"
-                    name="password" required placeholder="Sua senha" (focus)="passwordFocused = true"
-                    (blur)="passwordFocused = false" #password="ngModel">
+                <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                    placeholder="Sua senha" (focus)="passwordFocused = true" (blur)="passwordFocused = false">
                 <button mat-icon-button matSuffix type="button" (mousedown)="togglePassword($event)"
                     *ngIf="passwordFocused">
                     <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
-                <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+                <mat-error
+                    *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
                     A senha é obrigatória.
                 </mat-error>
             </mat-form-field>
@@ -39,8 +39,7 @@
                 <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
             </div>
 
-            <button mat-flat-button color="primary" type="submit" class="btn-primary"
-                [disabled]="!loginForm.form.valid">
+            <button mat-flat-button color="primary" type="submit" class="btn-primary" [disabled]="loginForm.invalid">
                 <span>Entrar</span>
                 <mat-icon iconPositionEnd>arrow_forward</mat-icon>
             </button>

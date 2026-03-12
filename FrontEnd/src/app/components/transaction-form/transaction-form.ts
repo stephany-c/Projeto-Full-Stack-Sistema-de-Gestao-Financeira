@@ -2,8 +2,7 @@ import { Component, EventEmitter, OnInit, Output, signal, ViewChild } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormGroupDirective } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
-// ... (mantenha os outros imports)
-import { CategoryService, Category } from '../../services/category.service';
+import { CategoryService } from '../../services/category.service';
 import { TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,10 +12,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { Category } from '../../models/category.model';
 
 @Component({
     selector: 'app-transaction-form',
-    // ... (mantenha o restante)
     standalone: true,
     imports: [
         CommonModule, ReactiveFormsModule, FormsModule,
@@ -26,10 +25,13 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     templateUrl: './transaction-form.html',
     styleUrl: './transaction-form.scss'
 })
+/**
+ * Componente de formulário para criação e edição de transações.
+ * Utiliza Reactive Forms e inclui lógica de máscara monetária e cadastro rápido de categorias.
+ */
 export class TransactionFormComponent implements OnInit {
     @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
     @Output() transactionCreated = new EventEmitter<void>();
-    // ... (mantenha as outras propriedades)
     transactionForm: FormGroup;
     transactionTypes = Object.values(TransactionType);
     categories = signal<Category[]>([]);
@@ -77,13 +79,13 @@ export class TransactionFormComponent implements OnInit {
         });
     }
 
-    // ... (pular loadCategories, loadTransaction, toggleQuickAdd, quickAddCategory)
+
     loadCategories(userId: number): void {
-        console.log('📂 Loading categories for userId:', userId);
+        console.log('Loading categories for userId:', userId);
         this.loading.set(true);
         this.categoryService.getAll().subscribe({
             next: (data: Category[]) => {
-                console.log('✅ Categories loaded:', data);
+                console.log('Categories loaded:', data);
                 this.categories.set(data);
                 this.loading.set(false);
                 this.hasCategories.set(data.length > 0);
@@ -92,7 +94,7 @@ export class TransactionFormComponent implements OnInit {
                 }
             },
             error: (err: any) => {
-                console.error('❌ Error loading categories:', err);
+                console.error('Error loading categories:', err);
                 this.loading.set(false);
             }
         });
@@ -123,6 +125,10 @@ export class TransactionFormComponent implements OnInit {
         this.newCategoryName = '';
     }
 
+    /**
+     * Adiciona uma nova categoria via "Quick Add" sem sair do formulário de transação.
+     * Facilita o fluxo de cadastro para categorias não existentes.
+     */
     quickAddCategory(): void {
         if (!this.newCategoryName.trim()) return;
 
@@ -143,6 +149,10 @@ export class TransactionFormComponent implements OnInit {
         });
     }
 
+    /**
+     * Submete o formulário para criar ou atualizar a transação.
+     * Realiza o tratamento de erro e limpeza de estado após sucesso.
+     */
     onSubmit(): void {
         if (this.transactionForm.valid) {
             const userId = this.authService.getUserId();
@@ -189,6 +199,10 @@ export class TransactionFormComponent implements OnInit {
     }
     formattedAmount = signal('');
 
+    /**
+     * Máscara monetária que converte entrada numérica bruta em formato R$ 0,00.
+     * Atualiza simultaneamente o valor numérico puro no Form Control.
+     */
     onAmountInput(event: any): void {
         const input = event.target;
         // Remove non-numeric characters

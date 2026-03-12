@@ -41,7 +41,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Coloque aqui a URL exata do seu frontend no Vercel
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
                 "https://projeto-full-stack-sistema-de-gesta-seven.vercel.app"));
@@ -62,9 +61,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Permite acesso público ao endpoint de health check para o "wake-up" do Render
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/transactions/export/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

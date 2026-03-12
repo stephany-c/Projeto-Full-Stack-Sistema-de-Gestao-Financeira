@@ -3,12 +3,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { Category } from '../models/category.model';
 
-export interface Category {
-    id: number;
-    name: string;
-}
-
+/**
+ * Serviço que gerencia as operações de CRUD para Categorias.
+ * Inclui suporte para transferência de transações ao excluir uma categoria.
+ */
 @Injectable({
     providedIn: 'root'
 })
@@ -17,6 +17,9 @@ export class CategoryService {
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
+    /**
+     * Recupera todas as categorias vinculadas ao usuário atual.
+     */
     getAll(): Observable<Category[]> {
         const userId = this.authService.getUserId();
         if (!userId) return new Observable(observer => observer.error('User not authenticated'));
@@ -25,6 +28,9 @@ export class CategoryService {
         return this.http.get<Category[]>(`${this.apiUrl}/user/${userId}`);
     }
 
+    /**
+     * Cria uma nova categoria para o usuário autenticado.
+     */
     create(name: string): Observable<Category> {
         const userId = this.authService.getUserId();
         if (!userId) {
@@ -43,6 +49,11 @@ export class CategoryService {
         return this.http.put<Category>(`${this.apiUrl}/${id}/user/${userId}`, body);
     }
 
+    /**
+     * Remove uma categoria. Opcionalmente move as transações existentes para outra categoria.
+     * @param id ID da categoria a ser excluída.
+     * @param transferToId (Opcional) ID da categoria destino para as transações.
+     */
     delete(id: number, transferToId?: number): Observable<void> {
         const userId = this.authService.getUserId();
         if (!userId) {
@@ -55,3 +66,5 @@ export class CategoryService {
         return this.http.delete<void>(`${this.apiUrl}/${id}/user/${userId}`, { params });
     }
 }
+
+

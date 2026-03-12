@@ -24,8 +24,14 @@
         }
     }
 
-    .period-select {
-        min-width: 200px;
+    .filters-container {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        .filter-select {
+            min-width: 140px;
+        }
     }
 }
 

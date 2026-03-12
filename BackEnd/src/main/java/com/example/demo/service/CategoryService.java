@@ -15,6 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Serviço responsável pela lógica de negócio das Categorias.
+ * Trata validações de nomes duplicados, inicialização de categorias padrão para
+ * novos usuários
+ * e a lógica de transferência de transações durante a exclusão.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,14 +30,21 @@ public class CategoryService {
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
 
+    /**
+     * Retorna todas as categorias de um usuário.
+     */
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> findAllByUser(Long userId) {
         return categoryRepository.findByUser_Id(userId)
                 .stream()
-                .map(this::toDTO)
+                .map(category -> this.toDTO(category))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cria uma nova categoria após validar se o nome já não existe para o usuário
+     * informado.
+     */
     @Transactional
     public CategoryResponseDTO create(CategoryRequestDTO dto, Long userId) {
         User user = userRepository.findById(userId)
@@ -52,6 +65,10 @@ public class CategoryService {
         return toDTO(saved);
     }
 
+    /**
+     * Atualiza o nome de uma categoria, garantindo que o novo nome não cause
+     * duplicidade.
+     */
     @Transactional
     public CategoryResponseDTO update(Long categoryId, CategoryRequestDTO dto, Long userId) {
         Category category = categoryRepository.findById(categoryId)
@@ -72,6 +89,11 @@ public class CategoryService {
         return toDTO(updated);
     }
 
+    /**
+     * Exclui uma categoria. Se transferToCategoryId for fornecido, move as
+     * transações existentes;
+     * caso contrário, exclui as transações vinculadas.
+     */
     @Transactional
     public void delete(Long categoryId, Long transferToCategoryId, Long userId) {
         Category category = categoryRepository.findById(categoryId)
@@ -90,6 +112,9 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
+    /**
+     * Cria o conjunto inicial de categorias para um usuário recém-cadastrado.
+     */
     @Transactional
     public void initializeDefaultCategories(User user) {
         List<Category> defaultCategories = List.of(
