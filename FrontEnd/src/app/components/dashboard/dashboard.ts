@@ -4,6 +4,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { format, parseISO } from 'date-fns';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -140,8 +141,8 @@ export class DashboardComponent implements OnInit {
         }
 
         return {
-            startDate: start.toISOString().split('T')[0],
-            endDate: end.toISOString().split('T')[0]
+            startDate: format(start, 'yyyy-MM-dd'),
+            endDate: format(end, 'yyyy-MM-dd')
         };
     }
 
@@ -218,7 +219,7 @@ export class DashboardComponent implements OnInit {
         }
 
         data.forEach(t => {
-            const date = new Date(t.date);
+            const date = t.date ? parseISO(t.date) : new Date();
             const key = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 
             if (!monthsMap.has(key)) {

@@ -7,6 +7,7 @@ import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
 import { Transaction, TransactionType } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth.service';
+import { format } from 'date-fns';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -74,8 +75,8 @@ export class TransactionListComponent implements OnInit {
         const end = this.endDate();
 
         // Convert Date objects to YYYY-MM-DD if they are Dates (from range picker)
-        const startDateStr = start instanceof Date ? start.toISOString().split('T')[0] : start;
-        const endDateStr = end instanceof Date ? end.toISOString().split('T')[0] : end;
+        const startDateStr = start instanceof Date ? format(start, 'yyyy-MM-dd') : start;
+        const endDateStr = end instanceof Date ? format(end, 'yyyy-MM-dd') : end;
 
         this.transactionService.getTransactions(
             this.currentPage(),
@@ -204,8 +205,8 @@ export class TransactionListComponent implements OnInit {
     exportToExcel(): void {
         const start = this.startDate();
         const end = this.endDate();
-        const startDateStr = start instanceof Date ? start.toISOString().split('T')[0] : start;
-        const endDateStr = end instanceof Date ? end.toISOString().split('T')[0] : end;
+        const startDateStr = start instanceof Date ? format(start, 'yyyy-MM-dd') : start;
+        const endDateStr = end instanceof Date ? format(end, 'yyyy-MM-dd') : end;
 
         this.transactionService.exportTransactions(
             this.selectedType() || undefined,

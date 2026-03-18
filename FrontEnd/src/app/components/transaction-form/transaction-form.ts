@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Category } from '../../models/category.model';
+import { format, parseISO } from 'date-fns';
 
 @Component({
     selector: 'app-transaction-form',
@@ -55,7 +56,7 @@ export class TransactionFormComponent implements OnInit {
         this.transactionForm = this.fb.group({
             description: ['', [Validators.required, Validators.minLength(3)]],
             amount: [0, [Validators.required, Validators.min(0.01)]],
-            date: [new Date().toISOString().split('T')[0], Validators.required],
+            date: [new Date(), Validators.required],
             type: [TransactionType.EXPENSE, Validators.required],
             categoryId: [null, Validators.required],
             userId: [null]
@@ -107,7 +108,7 @@ export class TransactionFormComponent implements OnInit {
                 this.transactionForm.patchValue({
                     description: transaction.description,
                     amount: transaction.amount,
-                    date: transaction.date,
+                    date: transaction.date ? parseISO(transaction.date) : new Date(),
                     type: transaction.type,
                     categoryId: transaction.categoryId
                 });
@@ -161,6 +162,10 @@ export class TransactionFormComponent implements OnInit {
                 return;
             }
             const formValue = { ...this.transactionForm.value, userId };
+            
+            if (formValue.date) {
+                formValue.date = format(formValue.date, 'yyyy-MM-dd');
+            }
 
             if (this.isEditing() && this.transactionId) {
                 this.transactionService.update(this.transactionId, formValue).subscribe({
@@ -180,7 +185,7 @@ export class TransactionFormComponent implements OnInit {
                             this.formDirective.resetForm({
                                 description: '',
                                 amount: 0,
-                                date: new Date().toISOString().split('T')[0],
+                                date: new Date(),
                                 type: TransactionType.EXPENSE,
                                 categoryId: this.categories()[0]?.id,
                                 userId
