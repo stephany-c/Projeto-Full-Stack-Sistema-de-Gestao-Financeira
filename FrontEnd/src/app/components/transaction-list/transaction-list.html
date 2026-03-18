@@ -70,7 +70,8 @@
         </mat-checkbox>
     </div>
 
-    <table class="transaction-table">
+    <div class="table-responsive">
+        <table class="transaction-table">
         <thead>
             <tr>
                 <th class="col-check">
@@ -161,7 +162,8 @@
                 </tr>
             </ng-container>
         </tbody>
-    </table>
+        </table>
+    </div>
 
     <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
 
