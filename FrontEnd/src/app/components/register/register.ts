@@ -28,8 +28,8 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  errorMessage = '';
-  successMessage = '';
+  errorMessage = ''; 
+  successMessage = ''; 
   showPassword = false;
   showConfirmPassword = false;
   passwordFocused = false;
@@ -40,16 +40,18 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone // Garante atualização de UI em operações async
   ) {
+    // Formulário de cadastro
     this.registerForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+    }, { validators: this.passwordMatchValidator }); 
   }
 
+  // Valida se as senhas coincidem
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
@@ -61,33 +63,40 @@ export class RegisterComponent {
     return null;
   }
 
+  // Alterna visibilidade da senha
   togglePassword(event: Event) {
-    event.preventDefault(); // Prevent blur from firing
+    event.preventDefault();
     this.showPassword = !this.showPassword;
   }
 
+  // Alterna visibilidade da confirmação
   toggleConfirmPassword(event: Event) {
     event.preventDefault();
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+  // Submissão do cadastro
   onRegister() {
-    this.errorMessage = ''; // Clear previous errors
+    this.errorMessage = '';
     this.successMessage = '';
 
     if (this.registerForm.invalid) return;
 
+    // Chama API de registro
     this.authService.register(this.registerForm.value).subscribe({
       next: () => {
         this.ngZone.run(() => {
           this.successMessage = 'Conta criada com sucesso! Redirecionando...';
           this.cdr.detectChanges();
         });
+
+        // Redireciona após 2s
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {
         this.ngZone.run(() => {
-          // Extract the backend message, handling string and object formats
+
+          // Extrai mensagem do backend
           let backendMsg: string | null = null;
 
           if (err.error) {
@@ -102,12 +111,13 @@ export class RegisterComponent {
             backendMsg = err.message || err.statusText || null;
           }
 
-          // Translate specific backend messages
+          // Trata erro conhecido (email duplicado)
           if (backendMsg && backendMsg.includes('Email is already in use')) {
             this.errorMessage = 'Este e-mail já está em uso.';
           } else {
             this.errorMessage = backendMsg || 'Erro ao criar conta. Tente novamente.';
           }
+
           console.error('Registration error:', err);
           this.cdr.detectChanges();
         });

@@ -4,6 +4,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+// Interface dos dados do dialog
 export interface ConfirmDialogData {
     title: string;
     message: string;
@@ -20,7 +21,11 @@ export interface ConfirmDialogData {
     styleUrl: './confirm-dialog.scss'
 })
 export class ConfirmDialogComponent {
+
+    // Dados recebidos ao abrir o dialog
     readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
+    
+    // Referência do dialog
     private dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
 
     onConfirm(): void {

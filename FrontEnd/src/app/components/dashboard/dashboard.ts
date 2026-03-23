@@ -18,16 +18,23 @@ import { MatOptionModule } from '@angular/material/core';
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.scss'
 })
+/**
+ * Dashboard financeiro: calcula totais e prepara dados para gráficos.
+ */
 export class DashboardComponent implements OnInit {
+
+    // Estado principal
     transactions = signal<Transaction[]>([]);
     totalIncome = signal(0);
     totalExpense = signal(0);
     balance = signal(0);
     monthlyResult = signal(0);
 
+    // Filtros de período
     selectedMonth = signal<number>(new Date().getMonth());
     selectedYear = signal<number>(new Date().getFullYear());
 
+    // -1: todos | -2: 1º semestre | -3: 2º semestre
     months = [
         { value: -1, label: 'Todos os meses' },
         { value: 0, label: 'Janeiro' },
@@ -48,13 +55,11 @@ export class DashboardComponent implements OnInit {
 
     years: number[] = [];
 
+    // Config gráfico pizza
     public pieChartOptions: ChartConfiguration['options'] = {
         responsive: true,
         plugins: {
-            legend: {
-                display: true,
-                position: 'right',
-            }
+            legend: { display: true, position: 'right' }
         }
     };
 
@@ -87,15 +92,12 @@ export class DashboardComponent implements OnInit {
 
     public trendChartOptions: ChartConfiguration['options'] = {
         responsive: true,
-        scales: {
-            y: { beginAtZero: true }
-        },
-        plugins: {
-            legend: { position: 'top' }
-        }
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { position: 'top' } }
     };
 
     constructor(private transactionService: TransactionService) {
+        // Gera lista de anos (passado + futuro próximo)
         const currentYear = new Date().getFullYear();
         for (let y = currentYear - 3; y <= currentYear + 1; y++) {
             this.years.push(y);
@@ -106,19 +108,23 @@ export class DashboardComponent implements OnInit {
         this.loadData();
     }
 
+    // Carrega dados conforme filtro
     loadData(): void {
         const { startDate, endDate } = this.getPeriodDates();
 
-        this.transactionService.getTransactions(0, 5000, undefined, undefined, startDate, endDate).subscribe(response => {
-            const data = response.content;
-            this.transactions.set(data);
-            this.calculateSummary(data);
-            this.calculateMonthlyTrend(data);
-        });
+        this.transactionService
+            .getTransactions(0, 5000, undefined, undefined, startDate, endDate)
+            .subscribe(response => {
+                const data = response.content;
+                this.transactions.set(data);
+
+                this.calculateSummary(data);
+                this.calculateMonthlyTrend(data);
+            });
     }
 
     /**
-     * Calcula as datas de início e fim com base no ano e mês selecionados.
+     * Retorna período (start/end) baseado no filtro selecionado.
      */
     private getPeriodDates(): { startDate?: string, endDate?: string } {
         let start: Date;
@@ -128,14 +134,15 @@ export class DashboardComponent implements OnInit {
             start = new Date(this.selectedYear(), 0, 1);
             end = new Date(this.selectedYear(), 11, 31, 23, 59, 59);
         } else if (this.selectedMonth() === -2) {
-            // 1º Semestre: Jan a Jun
+            // 1º semestre
             start = new Date(this.selectedYear(), 0, 1);
             end = new Date(this.selectedYear(), 5, 30, 23, 59, 59);
         } else if (this.selectedMonth() === -3) {
-            // 2º Semestre: Jul a Dez
+            // 2º semestre
             start = new Date(this.selectedYear(), 6, 1);
             end = new Date(this.selectedYear(), 11, 31, 23, 59, 59);
         } else {
+            // mês específico
             start = new Date(this.selectedYear(), this.selectedMonth(), 1);
             end = new Date(this.selectedYear(), this.selectedMonth() + 1, 0, 23, 59, 59);
         }
@@ -146,25 +153,26 @@ export class DashboardComponent implements OnInit {
         };
     }
 
+    // Disparado ao trocar mês/ano
     onMonthYearChange(): void {
         this.loadData();
     }
 
+    // Gera cores extras para categorias
     private generateColors(count: number): string[] {
         const baseColors = ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c', '#34495e', '#e74c3c', '#2ecc71'];
         if (count <= baseColors.length) return baseColors.slice(0, count);
 
-        // Generate more colors if needed
         const colors = [...baseColors];
         for (let i = baseColors.length; i < count; i++) {
-            const hue = (i * 137.5) % 360; // Golden angle for even distribution
+            const hue = (i * 137.5) % 360;
             colors.push(`hsl(${hue}, 70%, 60%)`);
         }
         return colors;
     }
 
     /**
-     * Calcula os totais e agrupa os dados de despesas por categoria para os gráficos.
+     * Calcula totais e agrupa despesas por categoria.
      */
     calculateSummary(data: Transaction[]): void {
         let income = 0;
@@ -176,16 +184,19 @@ export class DashboardComponent implements OnInit {
                 income += t.amount;
             } else {
                 expense += t.amount;
+
                 const catName = t.categoryName || 'Outros';
                 categoryMap.set(catName, (categoryMap.get(catName) || 0) + t.amount);
             }
         });
 
+        // Atualiza cards
         this.totalIncome.set(income);
         this.totalExpense.set(expense);
         this.balance.set(income - expense);
         this.monthlyResult.set(income - expense);
 
+        // Pizza (receita x despesa)
         this.pieChartData.set({
             labels: ['Receitas', 'Despesas'],
             datasets: [{
@@ -195,6 +206,7 @@ export class DashboardComponent implements OnInit {
             }]
         });
 
+        // Rosca (categorias)
         const categories = Array.from(categoryMap.keys());
         this.categoryChartData.set({
             labels: categories,
@@ -206,11 +218,14 @@ export class DashboardComponent implements OnInit {
         });
     }
 
+    /**
+     * Monta série mensal (receitas vs despesas).
+     */
     private calculateMonthlyTrend(data: Transaction[]): void {
         const monthsMap = new Map<string, { income: number, expense: number }>();
         const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-        // If "All Months" is selected, initialize all 12
+        // Garante 12 meses no modo "todos"
         if (this.selectedMonth() === -1) {
             for (let i = 0; i < 12; i++) {
                 const key = `${monthNames[i]} ${this.selectedYear()}`;
@@ -227,19 +242,17 @@ export class DashboardComponent implements OnInit {
             }
 
             const totals = monthsMap.get(key)!;
-            if (t.type === TransactionType.INCOME) {
-                totals.income += t.amount;
-            } else {
-                totals.expense += t.amount;
-            }
+            t.type === TransactionType.INCOME
+                ? totals.income += t.amount
+                : totals.expense += t.amount;
         });
 
+        // Ordena cronologicamente
         const sortedKeys = Array.from(monthsMap.keys()).sort((a, b) => {
             const [mA, yA] = a.split(' ');
             const [mB, yB] = b.split(' ');
-            const dateA = new Date(parseInt(yA), monthNames.indexOf(mA));
-            const dateB = new Date(parseInt(yB), monthNames.indexOf(mB));
-            return dateA.getTime() - dateB.getTime();
+            return new Date(+yA, monthNames.indexOf(mA)).getTime()
+                 - new Date(+yB, monthNames.indexOf(mB)).getTime();
         });
 
         this.trendChartData.set({

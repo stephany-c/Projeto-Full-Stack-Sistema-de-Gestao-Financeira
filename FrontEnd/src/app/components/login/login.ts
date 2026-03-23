@@ -11,11 +11,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
+  selector: 'app-login', 
+  standalone: true, 
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule, 
     RouterModule,
     MatCardModule,
     MatFormFieldModule,
@@ -27,36 +27,42 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  errorMessage = '';
-  showPassword = false;
+  loginForm: FormGroup; 
+  errorMessage = ''; 
+  showPassword = false; 
   passwordFocused = false;
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private fb: FormBuilder, 
+    private authService: AuthService, 
+    private router: Router, 
+    private cdr: ChangeDetectorRef 
   ) {
+    // Formulário de login com validações básicas
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
     });
   }
 
+  // Alterna visibilidade da senha
   togglePassword(event: Event) {
     event.preventDefault();
     this.showPassword = !this.showPassword;
   }
 
+  // Submissão do login
   onLogin() {
-    if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) return; // bloqueia envio inválido
 
+    // Chama API de autenticação
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
+        // Redireciona após sucesso
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
+        // Feedback de erro
         this.errorMessage = 'E-mail ou senha incorretos.';
         this.cdr.detectChanges();
         console.error(err);
@@ -64,4 +70,3 @@ export class LoginComponent {
     });
   }
 }
-

@@ -16,7 +16,7 @@ public class ExcelExportService {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Transações");
 
-            // Header Style
+            // Estilo de cabeçalho
             CellStyle headerStyle = workbook.createCellStyle();
             headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -24,7 +24,8 @@ public class ExcelExportService {
             font.setBold(true);
             headerStyle.setFont(font);
 
-            // Create Header Row
+           
+            // Criar linha de cabeçalho
             Row headerRow = sheet.createRow(0);
             String[] columns = { "Data", "Descrição", "Categoria", "Tipo", "Valor" };
             for (int i = 0; i < columns.length; i++) {
@@ -33,7 +34,8 @@ public class ExcelExportService {
                 cell.setCellStyle(headerStyle);
             }
 
-            // Create Data Rows
+            
+// Criar linhas de dados
             int rowIdx = 1;
             CreationHelper createHelper = workbook.getCreationHelper();
             CellStyle dateStyle = workbook.createCellStyle();
@@ -57,7 +59,8 @@ public class ExcelExportService {
                 row.createCell(4).setCellValue(t.getAmount().doubleValue());
             }
 
-            // Auto-size columns
+            
+// Colunas com dimensionamento automático
             for (int i = 0; i < columns.length; i++) {
                 sheet.autoSizeColumn(i);
             }

@@ -32,49 +32,61 @@ import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog'
     styleUrl: './transaction-list.scss'
 })
 /**
- * Componente que exibe a listagem de transações.
- * Suporta filtragem avançada, paginação dinâmica e edição em linha (inline).
+ * Lista de transações com:
+ * - filtros (data, tipo, categoria, busca)
+ * - paginação via API
+ * - seleção múltipla
+ * - edição inline
  */
 export class TransactionListComponent implements OnInit {
+
     private authService = inject(AuthService);
+
+    // Dados
     transactions = signal<Transaction[]>([]);
+    displayedTransactions = signal<Transaction[]>([]);
     categories = signal<Category[]>([]);
 
+    // Seleção (checkbox)
     selectedIds = signal<Set<number>>(new Set());
 
-    // Pagination signals
+    // Paginação
     currentPage = signal(0);
     pageSize = signal(10);
     totalElements = signal(0);
     totalPages = signal(0);
 
+    // Filtros
     startDate = signal<any>('');
     endDate = signal<any>('');
     selectedCategoryId = signal('');
     selectedType = signal('');
     searchTerm = signal('');
 
+    // Edição inline
+    editingTransactionId = signal<number | null>(null);
+    editData: any = {};
+
     constructor(
         private transactionService: TransactionService,
         private categoryService: CategoryService,
         private router: Router,
         private dialog: MatDialog
-    ) { }
-
+    ) {}
 
     ngOnInit(): void {
         this.loadTransactions();
         this.loadCategories();
     }
 
-    /**
-     * Carrega as transações do servidor aplicando os filtros de busca e paginação atuais.
-     */
+    // ========================
+    // DATA LOAD
+    // ========================
+
     loadTransactions(): void {
         const start = this.startDate();
         const end = this.endDate();
 
-        // Convert Date objects to YYYY-MM-DD if they are Dates (from range picker)
         const startDateStr = start instanceof Date ? format(start, 'yyyy-MM-dd') : start;
         const endDateStr = end instanceof Date ? format(end, 'yyyy-MM-dd') : end;
 
@@ -87,23 +99,69 @@ export class TransactionListComponent implements OnInit {
             endDateStr || undefined
         ).subscribe(response => {
             this.transactions.set(response.content);
+            this.applySearchFilter();
+
             this.totalElements.set(response.totalElements);
             this.totalPages.set(response.totalPages);
-            this.selectedIds.set(new Set()); // Limpa seleção ao mudar página/filtros
+
+            this.selectedIds.set(new Set());
         });
     }
 
     loadCategories(): void {
-        this.categoryService.getAll().subscribe(data => this.categories.set(data));
+        this.categoryService.getAll()
+            .subscribe(data => this.categories.set(data));
     }
 
-    /**
-     * Reseta a página para 0 e recarrega os dados após alteração de filtros.
-     */
+    // ========================
+    // FILTROS
+    // ========================
+
     applyFilter(): void {
         this.currentPage.set(0);
         this.loadTransactions();
     }
+
+    applySearchFilter(): void {
+        const term = (this.searchTerm() ?? '').trim().toLowerCase();
+
+        if (!term) {
+            this.displayedTransactions.set(this.transactions());
+            return;
+        }
+
+        const filtered = this.transactions().filter(t => {
+            const hay = [
+                t.description,
+                t.categoryName,
+                t.type,
+                String(t.amount),
+                t.date
+            ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+            return hay.includes(term);
+        });
+
+        this.displayedTransactions.set(filtered);
+    }
+
+    clearFilter(): void {
+        this.startDate.set('');
+        this.endDate.set('');
+        this.selectedCategoryId.set('');
+        this.selectedType.set('');
+        this.searchTerm.set('');
+        this.currentPage.set(0);
+
+        this.loadTransactions();
+    }
+
+    // ========================
+    // PAGINAÇÃO
+    // ========================
 
     onPageChange(page: number): void {
         this.currentPage.set(page);
@@ -122,23 +180,17 @@ export class TransactionListComponent implements OnInit {
         this.loadTransactions();
     }
 
-    clearFilter(): void {
-        this.startDate.set('');
-        this.endDate.set('');
-        this.selectedCategoryId.set('');
-        this.selectedType.set('');
-        this.searchTerm.set('');
-        this.currentPage.set(0);
-        this.loadTransactions();
-    }
+    // ========================
+    // DELETE
+    // ========================
 
-    deleteTransaction(id: number | undefined): void {
+    deleteTransaction(id?: number): void {
         if (!id) return;
 
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             data: {
                 title: 'Excluir Transação',
-                message: 'Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.',
+                message: 'Tem certeza que deseja excluir?',
                 confirmText: 'Excluir',
                 isDestructive: true
             }
@@ -146,21 +198,44 @@ export class TransactionListComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.transactionService.delete(id).subscribe(() => {
-                    this.loadTransactions();
-                });
+                this.transactionService.delete(id)
+                    .subscribe(() => this.loadTransactions());
             }
         });
     }
 
-    toggleSelection(id: number | undefined): void {
+    deleteSelected(): void {
+        const ids = Array.from(this.selectedIds());
+        if (!ids.length) return;
+
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: 'Excluir Selecionados',
+                message: `Excluir ${ids.length} transações?`,
+                confirmText: 'Excluir tudo',
+                isDestructive: true
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.transactionService.deleteMultiple(ids)
+                    .subscribe(() => this.loadTransactions());
+            }
+        });
+    }
+
+    // ========================
+    // SELECTION
+    // ========================
+
+    toggleSelection(id?: number): void {
         if (id === undefined) return;
+
         const current = new Set(this.selectedIds());
-        if (current.has(id)) {
-            current.delete(id);
-        } else {
-            current.add(id);
-        }
+
+        current.has(id) ? current.delete(id) : current.add(id);
+
         this.selectedIds.set(current);
     }
 
@@ -173,38 +248,22 @@ export class TransactionListComponent implements OnInit {
         if (this.isAllSelected()) {
             this.selectedIds.set(new Set());
         } else {
-            const allIds = this.transactions()
+            const ids = this.transactions()
                 .map(t => t.id)
                 .filter((id): id is number => id !== undefined);
-            this.selectedIds.set(new Set(allIds));
+
+            this.selectedIds.set(new Set(ids));
         }
     }
 
-    deleteSelected(): void {
-        const ids = Array.from(this.selectedIds());
-        if (ids.length === 0) return;
-
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: {
-                title: 'Excluir Selecionados',
-                message: `Tem certeza que deseja excluir as ${ids.length} transações selecionadas?`,
-                confirmText: 'Excluir Tudo',
-                isDestructive: true
-            }
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                this.transactionService.deleteMultiple(ids).subscribe(() => {
-                    this.loadTransactions();
-                });
-            }
-        });
-    }
+    // ========================
+    // EXPORT
+    // ========================
 
     exportToExcel(): void {
         const start = this.startDate();
         const end = this.endDate();
+
         const startDateStr = start instanceof Date ? format(start, 'yyyy-MM-dd') : start;
         const endDateStr = end instanceof Date ? format(end, 'yyyy-MM-dd') : end;
 
@@ -215,52 +274,48 @@ export class TransactionListComponent implements OnInit {
             endDateStr || undefined
         ).subscribe(blob => {
             const url = window.URL.createObjectURL(blob);
+
             const a = document.createElement('a');
             a.href = url;
-            a.download = `transacoes_${new Date().getTime()}.xlsx`;
+            a.download = `transacoes_${Date.now()}.xlsx`;
             a.click();
+
             window.URL.revokeObjectURL(url);
         });
     }
 
-    editingTransactionId = signal<number | null>(null);
-    editData: any = {};
+    // ========================
+    // INLINE EDIT
+    // ========================
 
-    /**
-     * Ativa o modo de edição inline para uma transação específica.
-     * Preenche o objeto temporário editData com os dados atuais da linha.
-     */
     startEdit(transaction: Transaction): void {
         if (!transaction.id) return;
+
         this.editingTransactionId.set(transaction.id);
         this.editData = { ...transaction };
 
-        // Fallback: If categoryId is missing but categoryName exists, try to find the ID
         if (!this.editData.categoryId && this.editData.categoryName) {
-            const foundCat = this.categories().find(c => c.name === this.editData.categoryName);
-            if (foundCat) {
-                this.editData.categoryId = foundCat.id;
-            }
+            const found = this.categories()
+                .find(c => c.name === this.editData.categoryName);
+
+            if (found) this.editData.categoryId = found.id;
         }
 
-        // Ensure date is in YYYY-MM-DD format for input
         if (this.editData.date) {
             this.editData.date = this.editData.date.split('T')[0];
         }
     }
 
-    /**
-     * Envia as alterações da edição inline para o servidor.
-     */
     saveEdit(): void {
         const id = this.editingTransactionId();
+
         if (id && this.editData) {
             this.transactionService.update(id, this.editData).subscribe({
-                next: (updated) => {
-                    this.loadTransactions(); // Refresh to ensure data consistency
+                next: () => {
+                    this.loadTransactions();
                     this.cancelEdit();
                 },
-                error: (err) => console.error('Error updating transaction:', err)
+                error: err => console.error('Update error:', err)
             });
         }
     }

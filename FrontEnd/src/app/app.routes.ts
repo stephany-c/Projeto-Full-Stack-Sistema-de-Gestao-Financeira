@@ -7,12 +7,13 @@ import { RegisterComponent } from './components/register/register';
 import { CategoryManagerComponent } from './components/category-manager/category-manager';
 import { authGuard } from './auth.guard';
 
+// Define todas as rotas (URLs) da aplicação e quais telas elas devem abrir
 export const routes: Routes = [
-    { path: 'login', component: LoginComponent },
-    { path: 'register', component: RegisterComponent },
-    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-    { path: 'transactions', component: TransactionListComponent, canActivate: [authGuard] },
-    { path: 'add-transaction', component: TransactionFormComponent, canActivate: [authGuard] },
-    { path: 'categories', component: CategoryManagerComponent, canActivate: [authGuard] },
-    { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    { path: 'login', component: LoginComponent }, // Tela de login (aberta, sem proteção)
+    { path: 'register', component: RegisterComponent }, // Tela de cadastro (aberta, sem proteção)
+    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] }, // Tela principal protegida pelo authGuard (só acessa logado)
+    { path: 'transactions', component: TransactionListComponent, canActivate: [authGuard] }, // Tabela de transações protegida
+    { path: 'add-transaction', component: TransactionFormComponent, canActivate: [authGuard] }, // Formulário protegido
+    { path: 'categories', component: CategoryManagerComponent, canActivate: [authGuard] }, // Gerenciador de categorias protegido
+    { path: '', redirectTo: 'dashboard', pathMatch: 'full' } // Rota padrão (raiz): se o usuário acessar '/', redireciona pro '/dashboard'
 ];

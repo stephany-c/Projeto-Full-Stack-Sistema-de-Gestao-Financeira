@@ -46,7 +46,7 @@
         <mat-form-field appearance="outline" class="search-field">
             <mat-label>Buscar</mat-label>
             <mat-icon matPrefix>search</mat-icon>
-            <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applyFilter()"
+            <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); applySearchFilter()"
                 placeholder="Descrição...">
         </mat-form-field>
 
@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <div class="mobile-select-all" *ngIf="transactions().length > 0">
+    <div class="mobile-select-all" *ngIf="displayedTransactions().length > 0">
         <mat-checkbox [checked]="isAllSelected()" (change)="toggleAll()">
             Selecionar todos os itens da página
         </mat-checkbox>
@@ -86,7 +86,7 @@
             </tr>
         </thead>
         <tbody>
-            <ng-container *ngFor="let t of transactions()">
+            <ng-container *ngFor="let t of displayedTransactions()">
                 <!-- View Mode -->
                 <tr *ngIf="editingTransactionId() !== t.id" [ngClass]="t.type.toLowerCase()">
                     <td class="col-check">
@@ -165,7 +165,7 @@
         </table>
     </div>
 
-    <p *ngIf="transactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
+    <p *ngIf="displayedTransactions().length === 0" class="empty-msg">Nenhuma transação encontrada.</p>
 
     <mat-paginator *ngIf="transactions().length > 0" [length]="totalElements()" [pageSize]="pageSize()"
         [pageIndex]="currentPage()" [pageSizeOptions]="[5, 10, 20, 50]" (page)="onMatPageChange($event)"
