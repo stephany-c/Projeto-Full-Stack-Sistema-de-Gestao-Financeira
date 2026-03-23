@@ -6,7 +6,7 @@
       <mat-form-field appearance="outline" class="filter-select">
         <mat-label>Ano</mat-label>
         <mat-select [value]="selectedYear()" (selectionChange)="selectedYear.set($event.value); onMonthYearChange()">
-          <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+          <mat-option *ngFor="let year of availableYears()" [value]="year">{{ year }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -38,15 +38,15 @@
 
     <mat-card class="summary-card income">
       <mat-card-content>
-        <p class="card-label">Total Receitas</p>
-        <p class="card-value positive">{{ totalIncome() | currency:'BRL' }}</p>
+        <p class="card-label">Receitas do Período</p>
+        <p class="card-value positive">{{ periodIncome() | currency:'BRL' }}</p>
       </mat-card-content>
     </mat-card>
 
     <mat-card class="summary-card expense">
       <mat-card-content>
-        <p class="card-label">Total Despesas</p>
-        <p class="card-value negative">{{ totalExpense() | currency:'BRL' }}</p>
+        <p class="card-label">Despesas do Período</p>
+        <p class="card-value negative">{{ periodExpense() | currency:'BRL' }}</p>
       </mat-card-content>
     </mat-card>
   </div>

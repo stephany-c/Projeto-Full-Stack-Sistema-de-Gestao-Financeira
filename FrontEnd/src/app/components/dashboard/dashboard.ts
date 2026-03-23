@@ -30,9 +30,16 @@ export class DashboardComponent implements OnInit {
     balance = signal(0);
     monthlyResult = signal(0);
 
+    // Totais do período
+    periodIncome = signal(0);
+    periodExpense = signal(0);
+
     // Filtros de período
     selectedMonth = signal<number>(new Date().getMonth());
     selectedYear = signal<number>(new Date().getFullYear());
+
+    // Anos disponíveis dinamicamente baseados nas transações
+    availableYears = signal<number[]>([]);
 
     // -1: todos | -2: 1º semestre | -3: 2º semestre
     months = [
@@ -112,14 +119,24 @@ export class DashboardComponent implements OnInit {
     loadData(): void {
         const { startDate, endDate } = this.getPeriodDates();
 
+        // Carrega transações do período para gráficos e resultado do período
         this.transactionService
             .getTransactions(0, 5000, undefined, undefined, startDate, endDate)
             .subscribe(response => {
                 const data = response.content;
                 this.transactions.set(data);
 
-                this.calculateSummary(data);
+                this.calculateMonthlyResult(data);
                 this.calculateMonthlyTrend(data);
+            });
+
+        // Carrega TODAS as transações para calcular saldo geral e extrair anos disponíveis
+        this.transactionService
+            .getTransactions(0, 5000, undefined, undefined, '2000-01-01', '2099-12-31')
+            .subscribe(response => {
+                const allData = response.content;
+                this.calculateBalance(allData);
+                this.extractAvailableYears(allData);
             });
     }
 
@@ -172,9 +189,29 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
-     * Calcula totais e agrupa despesas por categoria.
+     * Calcula saldo geral (todas as transações).
      */
-    calculateSummary(data: Transaction[]): void {
+    private calculateBalance(data: Transaction[]): void {
+        let income = 0;
+        let expense = 0;
+
+        data.forEach(t => {
+            if (t.type === TransactionType.INCOME) {
+                income += t.amount;
+            } else {
+                expense += t.amount;
+            }
+        });
+
+        this.totalIncome.set(income);
+        this.totalExpense.set(expense);
+        this.balance.set(income - expense);
+    }
+
+    /**
+     * Calcula resultado do período (apenas transações do período).
+     */
+    private calculateMonthlyResult(data: Transaction[]): void {
         let income = 0;
         let expense = 0;
         const categoryMap = new Map<string, number>();
@@ -184,19 +221,16 @@ export class DashboardComponent implements OnInit {
                 income += t.amount;
             } else {
                 expense += t.amount;
-
                 const catName = t.categoryName || 'Outros';
                 categoryMap.set(catName, (categoryMap.get(catName) || 0) + t.amount);
             }
         });
 
-        // Atualiza cards
-        this.totalIncome.set(income);
-        this.totalExpense.set(expense);
-        this.balance.set(income - expense);
         this.monthlyResult.set(income - expense);
+        this.periodIncome.set(income);
+        this.periodExpense.set(expense);
 
-        // Pizza (receita x despesa)
+        // Pizza (receita x despesa do período)
         this.pieChartData.set({
             labels: ['Receitas', 'Despesas'],
             datasets: [{
@@ -206,7 +240,7 @@ export class DashboardComponent implements OnInit {
             }]
         });
 
-        // Rosca (categorias)
+        // Rosca (categorias do período)
         const categories = Array.from(categoryMap.keys());
         this.categoryChartData.set({
             labels: categories,
@@ -216,6 +250,28 @@ export class DashboardComponent implements OnInit {
                 borderWidth: 0
             }]
         });
+    }
+
+    /**
+     * Extrai anos únicos das transações para popular o select de forma dinâmica.
+     */
+    private extractAvailableYears(data: Transaction[]): void {
+        const yearsSet = new Set<number>();
+        
+        data.forEach(t => {
+            if (t.date) {
+                const year = parseISO(t.date).getFullYear();
+                yearsSet.add(year);
+            }
+        });
+
+        const sortedYears = Array.from(yearsSet).sort((a, b) => b - a); // Mais recente primeiro
+        this.availableYears.set(sortedYears);
+
+        // Se o ano atual não estiver na lista, mas tivermos transações, seleciona o mais recente
+        if (!sortedYears.includes(this.selectedYear()) && sortedYears.length > 0) {
+            this.selectedYear.set(sortedYears[0]);
+        }
     }
 
     /**

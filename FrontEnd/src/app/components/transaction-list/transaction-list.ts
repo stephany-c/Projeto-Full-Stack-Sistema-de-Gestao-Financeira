@@ -43,8 +43,9 @@ export class TransactionListComponent implements OnInit {
     private authService = inject(AuthService);
 
     // Dados
-    transactions = signal<Transaction[]>([]);
-    displayedTransactions = signal<Transaction[]>([]);
+    allTransactions = signal<Transaction[]>([]); // Todas as transações carregadas
+    transactions = signal<Transaction[]>([]); // Transações da página atual
+    displayedTransactions = signal<Transaction[]>([]); // Transações exibidas após busca
     categories = signal<Category[]>([]);
 
     // Seleção (checkbox)
@@ -106,6 +107,19 @@ export class TransactionListComponent implements OnInit {
 
             this.selectedIds.set(new Set());
         });
+
+        // Carrega TODAS as transações com os mesmos filtros para busca global
+        this.transactionService.getTransactions(
+            0,
+            5000, // PageSize grande para pegar tudo
+            this.selectedType() || undefined,
+            this.selectedCategoryId() ? +this.selectedCategoryId() : undefined,
+            startDateStr || undefined,
+            endDateStr || undefined
+        ).subscribe(response => {
+            this.allTransactions.set(response.content);
+            this.applySearchFilter();
+        });
     }
 
     loadCategories(): void {
@@ -126,11 +140,13 @@ export class TransactionListComponent implements OnInit {
         const term = (this.searchTerm() ?? '').trim().toLowerCase();
 
         if (!term) {
+            // Sem termo de busca: mostra transações da página atual
             this.displayedTransactions.set(this.transactions());
             return;
         }
 
-        const filtered = this.transactions().filter(t => {
+        // Com termo de busca: busca em TODAS as transações carregadas
+        const filtered = this.allTransactions().filter(t => {
             const hay = [
                 t.description,
                 t.categoryName,

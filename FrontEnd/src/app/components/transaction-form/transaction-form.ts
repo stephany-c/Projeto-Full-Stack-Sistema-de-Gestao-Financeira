@@ -27,239 +27,214 @@ import { format, parseISO } from 'date-fns';
     styleUrl: './transaction-form.scss'
 })
 /**
- * Componente central do formulário de criação e edição gráfica de transações financeiras.
- * Consome fortemente Angular Reactive Forms e inclui lógicas avançadas nativas de máscara monetária, 
- * além de permitir um cadastro "rápido" (Quick Add) de categorias sem precisar sair da tela.
+ * Formulário de criação e edição de transações.
  */
 export class TransactionFormComponent implements OnInit {
-    // Captura a diretiva do FormGroup do HTML para forçar resets profundos do Material Design
-    @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
-    
-    // Emite um aviso silencioso para componentes pais avisando que "uma nova transação foi criada"
-    @Output() transactionCreated = new EventEmitter<void>();
-    
-    // O formulário reativo mestre
-    transactionForm: FormGroup;
-    
-    // Enum extraido para popular Selects visualmente ("Receita", "Despesa")
-    transactionTypes = Object.values(TransactionType);
-    
-    // Signals (Estado reativo moderno) controlando a tela
-    categories = signal<Category[]>([]);
-    loading = signal<boolean>(false); // Mostra spinner ou bloqueia botões temporariamente
-    hasCategories = signal<boolean>(true); // Flag para avisar usuário que ele precisa de categorias antes de prosseguir
-    isEditing = signal<boolean>(false); // Flag de Rota: Estamos na página de Editar ou de Criar?
 
-    transactionId: number | null = null;
+    @ViewChild(FormGroupDirective) formDirective!: FormGroupDirective;
+    @Output() transactionCreated = new EventEmitter<void>();
+
+    // Formulário principal
+    transactionForm: FormGroup;
+
+    // Dados auxiliares
+    transactionTypes = Object.values(TransactionType);
+    categories = signal<Category[]>([]);
+
+    // Estados
+    loading = signal(false);
+    hasCategories = signal(true);
+    isEditing = signal(false);
     successMessage = signal<string | null>(null);
 
-    // Controles para o recurso híbrido de Quick Add de Categoria
-    isAddingCategory = signal<boolean>(false);
+    // Controle de edição
+    transactionId: number | null = null;
+
+    // Quick add de categoria
+    isAddingCategory = signal(false);
     newCategoryName = '';
+
+    // Máscara de valor (R$)
+    formattedAmount = signal('');
 
     constructor(
         private fb: FormBuilder,
         private transactionService: TransactionService,
         private categoryService: CategoryService,
         private authService: AuthService,
-        private route: ActivatedRoute, // Inspeciona a URL atual para caçar IDs
+        private route: ActivatedRoute,
         private router: Router
     ) {
-        // Inicializa as fundações e regras base do Formulário
         this.transactionForm = this.fb.group({
             description: ['', [Validators.required, Validators.minLength(3)]],
-            amount: [0, [Validators.required, Validators.min(0.01)]], // Zero não passa!
+            amount: [0, [Validators.required, Validators.min(0.01)]],
             date: [new Date(), Validators.required],
             type: [TransactionType.EXPENSE, Validators.required],
             categoryId: [null, Validators.required],
-            userId: [null] // Injetado ocultamente via JWT Token extraído
+            userId: [null]
         });
     }
 
     ngOnInit(): void {
         const userId = this.authService.getUserId();
+
         if (userId) {
             this.transactionForm.patchValue({ userId });
-            this.loadCategories(userId); // Busca categorias liberadas para este usuário logado
+            this.loadCategories(userId);
         }
 
-        // Fica de olho na URL de forma reativa. Se o path tiver um ID (ex: /transactions/edit/15), assume modo Edição.
+        // Verifica se está em modo edição pela rota
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
+
             if (id) {
                 this.isEditing.set(true);
                 this.transactionId = +id;
-                this.loadTransaction(this.transactionId); // Popula imediatamente a tela com os dados vindos do banco
+                this.loadTransaction(this.transactionId);
             }
         });
     }
 
-    // Busca tabela de categorias do Backend e salva no Signal principal para popular combobox/selects
+    // ========================
+    // CARREGAMENTO
+    // ========================
+
     loadCategories(userId: number): void {
-        console.log('Loading categories for userId:', userId);
-        this.loading.set(true); // Trava reatividade com carregamento visual
+        this.loading.set(true);
+
         this.categoryService.getAll().subscribe({
-            next: (data: Category[]) => {
-                console.log('Categories loaded:', data);
+            next: data => {
                 this.categories.set(data);
-                this.loading.set(false);
                 this.hasCategories.set(data.length > 0);
-                
-                // Se houver categorias cadastradas num formulário "novo", pré-seleciona a primeira para agilizar
-                if (data.length > 0 && !this.isEditing()) {
+                this.loading.set(false);
+
+                // Seleciona primeira categoria automaticamente (modo criação)
+                if (data.length && !this.isEditing()) {
                     this.transactionForm.patchValue({ categoryId: data[0].id });
                 }
             },
-            error: (err: any) => {
-                console.error('Error loading categories:', err);
-                this.loading.set(false);
-            }
+            error: () => this.loading.set(false)
         });
     }
 
-    // Usado em Modo Edição: Pega o ID de uma transação e enfia os dados dentro dos Inputs da página
     loadTransaction(id: number): void {
         this.loading.set(true);
+
         this.transactionService.getById(id).subscribe({
-            next: (transaction: any) => {
+            next: t => {
                 this.transactionForm.patchValue({
-                    description: transaction.description,
-                    amount: transaction.amount,
-                    date: transaction.date ? parseISO(transaction.date) : new Date(), // Deserializa a Data vinda da API
-                    type: transaction.type,
-                    categoryId: transaction.categoryId
+                    description: t.description,
+                    amount: t.amount,
+                    date: t.date ? parseISO(t.date) : new Date(),
+                    type: t.type,
+                    categoryId: t.categoryId
                 });
+
                 this.loading.set(false);
             },
-            error: (err) => {
-                console.error('Error loading transaction:', err);
-                this.loading.set(false);
-            }
+            error: () => this.loading.set(false)
         });
     }
 
-    // Esconde/Exibe o mini-form flutuante de criar categoria rápida
+    // ========================
+    // QUICK ADD
+    // ========================
+
     toggleQuickAdd(): void {
         this.isAddingCategory.set(!this.isAddingCategory());
         this.newCategoryName = '';
     }
 
-    /**
-     * Adiciona uma nova categoria via "Quick Add" sem sair da página do formulário de transação.
-     * Facilita o fluxo de cadastro para categorias não existentes sem que o usuário perca tudo que já digitou.
-     */
     quickAddCategory(): void {
         if (!this.newCategoryName.trim()) return;
 
         this.loading.set(true);
+
         this.categoryService.create(this.newCategoryName).subscribe({
-            next: (newCat) => {
+            next: newCat => {
                 const userId = this.authService.getUserId();
+
                 if (userId) {
-                    this.loadCategories(userId); // Recarrega a lista completa
-                    this.transactionForm.patchValue({ categoryId: newCat.id }); // Auto-seleciona a categoria que acabou de ser criada
+                    this.loadCategories(userId);
+                    this.transactionForm.patchValue({ categoryId: newCat.id });
                 }
-                this.toggleQuickAdd(); // Fecha o mini-form
+
+                this.toggleQuickAdd();
             },
-            error: (err) => {
-                console.error('Error adding category:', err);
-                this.loading.set(false);
-            }
+            error: () => this.loading.set(false)
         });
     }
 
-    /**
-     * Motor de colheita e envio. Submete os dados inseridos e sanitizados para rodar a requisição HTTP.
-     * Diferencia internamente caso esteja editando (PUT) ou Criando (POST)
-     */
+    // ========================
+    // SUBMIT
+    // ========================
+
     onSubmit(): void {
-        if (this.transactionForm.valid) { // Regra dura: Se estiver inválido, desiste
-            const userId = this.authService.getUserId();
-            if (!userId) {
-                console.error('User not authenticated');
-                return;
-            }
-            const formValue = { ...this.transactionForm.value, userId }; // Desestrutura clonando os valores e injetando o dono
-            
-            // Corrige fusos-horários transformando a Data pura ISO para um formato aceitável (ex. "2024-11-20") na API
-            if (formValue.date) {
-                formValue.date = format(formValue.date, 'yyyy-MM-dd');
-            }
+        if (this.transactionForm.invalid) return;
 
-            if (this.isEditing() && this.transactionId) {
-                // Modo PUT
-                this.transactionService.update(this.transactionId, formValue).subscribe({
-                    next: () => {
-                        this.router.navigate(['/transactions']); // Retorna à lista após sucesso
-                    },
-                    error: (err) => console.error('Error updating:', err)
-                });
-            } else {
-                // Modo POST
-                this.transactionService.create(formValue).subscribe({
-                    next: () => {
-                        this.successMessage.set('Transação cadastrada!');
-                        setTimeout(() => this.successMessage.set(null), 3000);
+        const userId = this.authService.getUserId();
+        if (!userId) return;
 
-                        // Reset massivo completo do formulário mantendo apenas configurações padrão
-                        if (this.formDirective) {
-                            this.formDirective.resetForm({
-                                description: '',
-                                amount: 0,
-                                date: new Date(),
-                                type: TransactionType.EXPENSE,
-                                categoryId: this.categories()[0]?.id,
-                                userId
-                            });
-                        }
+        const formValue = { ...this.transactionForm.value, userId };
 
-                        this.formattedAmount.set('');
-                        this.transactionCreated.emit(); // Comunica aos componentes próximos caso precisem atualizar dados
-                    },
-                    error: (err) => {
-                        console.error('Error creating transaction:', err);
-                    }
-                });
-            }
+        // Ajusta formato da data para API
+        if (formValue.date) {
+            formValue.date = format(formValue.date, 'yyyy-MM-dd');
+        }
+
+        if (this.isEditing() && this.transactionId) {
+            this.transactionService.update(this.transactionId, formValue)
+                .subscribe(() => this.router.navigate(['/transactions']));
+        } else {
+            this.transactionService.create(formValue).subscribe({
+                next: () => {
+                    this.successMessage.set('Transação cadastrada!');
+                    setTimeout(() => this.successMessage.set(null), 3000);
+
+                    // Reset do formulário
+                    this.formDirective?.resetForm({
+                        description: '',
+                        amount: 0,
+                        date: new Date(),
+                        type: TransactionType.EXPENSE,
+                        categoryId: this.categories()[0]?.id,
+                        userId
+                    });
+
+                    this.formattedAmount.set('');
+                    this.transactionCreated.emit();
+                }
+            });
         }
     }
 
-    // Variável puramente visual que renderiza "R$" no input numérico da tela
-    formattedAmount = signal('');
+    // ========================
+    // MÁSCARA DE VALOR
+    // ========================
 
-    /**
-     * Máscara monetária que converte entrada numérica bruta (ao longo do pressionar das teclas) para o formato R$ 0,00.
-     * Atualiza simultaneamente o valor numérico puro under-the-hood no Form Control (12.34).
-     */
     onAmountInput(event: any): void {
         const input = event.target;
-        // Corta tudo que não for dígito limpo nativo
         let value = input.value.replace(/\D/g, '');
 
-        // Se deletou tudo, limpa o state
         if (!value) {
             this.transactionForm.patchValue({ amount: null });
             this.formattedAmount.set('');
             return;
         }
 
-        // Converte string dura para decimal. Ex: teclas "1234" = Float "12.34"
         const floatValue = parseFloat(value) / 100;
 
-        // Injeta silenciosamente no Form pra que a API receba algo compatível
         this.transactionForm.patchValue({ amount: floatValue });
 
-        // Formata nativa do browser para exibir elegantemente "R$ 12,34"
         const formatted = new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
         }).format(floatValue);
 
         this.formattedAmount.set(formatted);
-        input.value = formatted; // Recíproca: Altera o texto renderizado
+        input.value = formatted;
     }
 
-    // Triga regras de validação visual caso o campo de "valor" perca o foco sem ser modificado.
     onAmountBlur(): void {
         this.transactionForm.get('amount')?.markAsTouched();
     }
