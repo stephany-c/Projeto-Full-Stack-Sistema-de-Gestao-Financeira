@@ -1,4 +1,4 @@
-# FinançaX - Sistema de Gestão Financeira Personalizada 💰🚀
+# FinançaX - Sistema de Gestão Financeira Personalizada
 
 O **FinançaX** é uma solução Full Stack moderna e robusta para controle de finanças pessoais. Desenvolvida com **Java (Spring Boot)** e **Angular**, a aplicação oferece uma experiência de usuário premium com foco em performance, segurança e design responsivo.
 
@@ -34,14 +34,14 @@ Este projeto é dividido em duas partes principais: um frontend construído com 
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
-- **📊 Dashboard Interativo**: Visualização gráfica (Rosca e Barras) de receitas e despesas.
-- **📝 Gestão de Transações**: CRUD completo com filtragem por data, tipo e categoria.
-- **⚡ Edição Inline**: Atualize valores e descrições diretamente na listagem sem abrir modais.
-- **🏷️ Categorias Inteligentes**: Sistema híbrido de categorias globais e personalizadas.
-- **🔐 Autenticação JWT**: Login seguro com tokens e interceptors no frontend.
-- **📱 UX/UI Premium**: Design Glassmorphism, responsivo e com feedback visual imediato (Toasts).
+- ** Dashboard Interativo**: Visualização gráfica (Rosca e Barras) de receitas e despesas.
+- ** Gestão de Transações**: CRUD completo com filtragem por data, tipo e categoria.
+- ** Edição Inline**: Atualize valores e descrições diretamente na listagem sem abrir modais.
+- ** Categorias Inteligentes**: Sistema híbrido de categorias globais e personalizadas.
+- ** Autenticação JWT**: Login seguro com tokens e interceptors no frontend.
+- ** UX/UI Premium**: Design Glassmorphism, responsivo e com feedback visual imediato (Toasts).
 
 ---
 
