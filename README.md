@@ -1,6 +1,6 @@
 # FinançaX - Sistema de Gestão Financeira Personalizada
 
-O **FinançaX** é uma solução Full Stack moderna e robusta para controle de finanças pessoais. Desenvolvida com **Java (Spring Boot)** e **Angular**, a aplicação oferece uma experiência de usuário premium com foco em performance, segurança e design responsivo.
+O **FinançaX** é uma solução Full Stack para controle de finanças pessoais. Desenvolvida com **Java (Spring Boot)** e **Angular**, a aplicação oferece uma experiência de usuário premium com foco em performance, segurança e design responsivo.
 
 ![FinançaX Preview](https://img.shields.io/badge/Status-Concluído-green?style=for-the-badge)
 ![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white)
