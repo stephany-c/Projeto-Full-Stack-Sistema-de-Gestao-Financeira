@@ -36,12 +36,12 @@ Este projeto é dividido em duas partes principais: um frontend construído com 
 
 ## Funcionalidades Principais
 
-- ** Dashboard Interativo**: Visualização gráfica (Rosca e Barras) de receitas e despesas.
-- ** Gestão de Transações**: CRUD completo com filtragem por data, tipo e categoria.
-- ** Edição Inline**: Atualize valores e descrições diretamente na listagem sem abrir modais.
-- ** Categorias Inteligentes**: Sistema híbrido de categorias globais e personalizadas.
-- ** Autenticação JWT**: Login seguro com tokens e interceptors no frontend.
-- ** UX/UI Premium**: Design Glassmorphism, responsivo e com feedback visual imediato (Toasts).
+- ** Dashboard Interativo**: Visualização gráfica de receitas e despesas.
+- ** Gestão de Transações**: CRUD com filtragem por data, tipo e categoria.
+- ** Categorias Inteligentes**: Possibilidade de excluir , editar e criar novas categorias.
+- ** Exportação para Excel**: Possibilidade de exportação das transações para Excel.
+- ** Autenticação JWT**: Login com tokens e interceptors no frontend.
+- ** UX/UI **: Responsivo e com feedback visual imediato (Toasts).
 
 ---
 
